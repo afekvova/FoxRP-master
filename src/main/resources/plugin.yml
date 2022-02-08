@@ -1,0 +1,9 @@
+name: FoxRP
+version: '${project.version}'
+main: me.afek.foxrp.FoxRPPlugin
+depend: [ SkinsRestorer ]
+authors: [ Afek ]
+website: afek.ru, t.me/afekvova, vk.com/afekvova, github.com/afekvova
+
+commands:
+  test:
