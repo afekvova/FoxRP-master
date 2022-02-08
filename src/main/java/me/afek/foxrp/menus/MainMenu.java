@@ -14,8 +14,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -33,6 +31,7 @@ public class MainMenu implements IMenuClosable {
         this.inventory.setItem(3, ItemCommon.getItem("basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM5MDZkNjg4ZTY1ODAyNTY5ZDk3MDViNTc5YmNlNTZlZGM4NmVhNWMzNmJkZDZkNmZjMzU1MTZhNzdkNCJ9fX0=", "&aСоздать персонажа", 1, "&7", "&7Нажмите, чтобы создать персонажа"));
         this.inventory.setItem(4, ItemCommon.getItem(Material.BARRIER.name(), "&eОтключить персонажа", 1, "&7", "&7Нажмите, чтобы отключить персонажа"));
         this.inventory.setItem(5, ItemCommon.getItem("basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3OGZhNWRlZmU3MmRlYmNkOWM3NmFiOWY0ZTExNDI1MDQ3OWJiOWI0NGY0Mjg4N2JiZjZmNzM4NjEyYiJ9fX0=", "&cУдалить персонажа", 1, "&7", "&7Нажмите, чтобы удалить персонажа"));
+        this.inventory.setItem(49, ItemCommon.getItem(Material.BOOK.name(), "&cСтраница номер " + this.page, 1));
     }
 
     @Override
@@ -54,26 +53,10 @@ public class MainMenu implements IMenuClosable {
         player.openInventory(this.inventory);
     }
 
-//    public void nextPage(Player player) {
-//        int page = this.getPlayerPage(player);
-//        page = ++page;
-//        this.playersPage.put(player.getName().toLowerCase(), page);
-//        this.updateInventory(player, page);
-//    }
-//
-//    public void previousPage(Player player) {
-//        int page = this.getPlayerPage(player);
-//        page = page > 1 ? --page : page;
-//        this.playersPage.put(player.getName().toLowerCase(), page);
-//        this.updateInventory(player, page);
-//    }
-
     public void updateInventory() {
         this.inventory.clear();
         loadItems();
-        List<HeroData> dataList = new ArrayList<>();
-        for (int i = 0; i < 112; i++)
-            dataList.add(new HeroData("&cПроверка", "Giovanka"));
+
         int size = dataList.size();
         int index = page * 36 - 36 > size ? 1 : page * 36 - 36;
         int endIndex = Math.min((index + 36), size);
@@ -83,9 +66,6 @@ public class MainMenu implements IMenuClosable {
             inventory.setItem(slot, this.getHead(heroData));
             ++slot;
         }
-
-        this.inventory.setItem(49, ItemCommon.getItem(Material.BOOK.name(), "&cСтраница номер " + this.page, 1));
-
 
         if (size > endIndex)
             this.inventory.setItem(53, ItemCommon.getItem(Material.ARROW.name(), "&aСлед. страница", 1));
