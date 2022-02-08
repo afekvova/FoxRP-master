@@ -2,7 +2,7 @@ package me.afek.foxrp.menus;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import me.afek.foxrp.api.menu.IMenuClosable;
+import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.objects.HeroData;
@@ -17,14 +17,16 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MainMenu implements IMenuClosable {
+public class MainMenu implements IMenu {
 
     Inventory inventory;
     int page = 1;
+    boolean deleteMenu;
 
-    public MainMenu(Player player) {
+    public MainMenu(boolean deleteMenu) {
         this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color("&cВыберите персонажа"));
         this.loadItems();
+        this.deleteMenu = deleteMenu;
     }
 
     private void loadItems() {
@@ -86,10 +88,5 @@ public class MainMenu implements IMenuClosable {
     @Override
     public Inventory getInventory() {
         return this.inventory;
-    }
-
-    @Override
-    public void onClose() {
-
     }
 }

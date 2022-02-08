@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
+import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.menus.MainMenu;
 import me.afek.foxrp.services.HeadService;
 import org.bukkit.Bukkit;
@@ -20,10 +21,13 @@ public final class FoxRPPlugin extends JavaPlugin {
     static FoxRPPlugin instance;
     @Getter
     HeadService headService;
+    @Getter
+    DataCommon dataCommon;
 
     @Override
     public void onEnable() {
         instance = this;
+        this.dataCommon = new DataCommon();
         this.headService = new HeadService();
         this.registerListeners();
         this.getCommand("test").setExecutor(this);
@@ -37,8 +41,14 @@ public final class FoxRPPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
-        MainMenu mainMenu = new MainMenu(player);
+        MainMenu mainMenu = new MainMenu(false);
         mainMenu.show(player);
         return true;
+    }
+
+    @Override
+    public void onDisable() {
+        if (this.dataCommon != null)
+            this.dataCommon.clearAll();
     }
 }
