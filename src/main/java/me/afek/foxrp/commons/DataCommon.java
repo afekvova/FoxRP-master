@@ -1,5 +1,6 @@
 package me.afek.foxrp.commons;
 
+import lombok.Getter;
 import me.afek.foxrp.objects.HeroData;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DataCommon {
 
+    @Getter
     private final ConcurrentHashMap<String, List<HeroData>> playerData;
 
     public DataCommon() {
@@ -21,6 +23,10 @@ public class DataCommon {
 
         playerHeroes.add(heroData);
         this.playerData.put(name.toLowerCase(), playerHeroes);
+    }
+
+    public void addPlayerHeroes(String name, List<HeroData> heroData) {
+        this.playerData.put(name.toLowerCase(), heroData);
     }
 
     public List<HeroData> getPlayerHeroes(String name) {

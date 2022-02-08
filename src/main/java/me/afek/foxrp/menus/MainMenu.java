@@ -14,6 +14,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -58,7 +60,9 @@ public class MainMenu implements IMenu {
     public void updateInventory() {
         this.inventory.clear();
         loadItems();
-
+        List<HeroData> dataList = new ArrayList<>();
+        for (int i = 0; i < 112; i++)
+            dataList.add(new HeroData("&cПроверка", "Giovanka"));
         int size = dataList.size();
         int index = page * 36 - 36 > size ? 1 : page * 36 - 36;
         int endIndex = Math.min((index + 36), size);
