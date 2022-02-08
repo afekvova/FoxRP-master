@@ -6,18 +6,16 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.menus.MainMenu;
-import me.afek.foxrp.objects.HeroData;
 import me.afek.foxrp.services.HeadService;
 import me.afek.foxrp.services.PlayerDataService;
+import net.skinsrestorer.api.SkinsRestorerAPI;
+import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public final class FoxRPPlugin extends JavaPlugin {
@@ -37,11 +35,7 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.dataCommon = new DataCommon();
         this.headService = new HeadService();
         this.playerDataService = new PlayerDataService(this, this.dataCommon);
-        List<HeroData> dataList = new ArrayList<>();
-        for (int i = 0; i < 112; i++)
-            dataList.add(new HeroData("&cПроверка", "Giovanka"));
-        this.dataCommon.addPlayerHeroes("Afek", dataList);
-        this.playerDataService.savePlayerData();
+
         this.registerListeners();
         this.getCommand("test").setExecutor(this);
     }
@@ -54,6 +48,7 @@ public final class FoxRPPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
+        IProperty property = SkinsRestorerAPI.getApi().getProfile();
         MainMenu mainMenu = new MainMenu(false);
         mainMenu.show(player);
         return true;
@@ -61,6 +56,8 @@ public final class FoxRPPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (this.playerDataService != null)
+            this.playerDataService.savePlayerData();
         if (this.dataCommon != null)
             this.dataCommon.clearAll();
     }

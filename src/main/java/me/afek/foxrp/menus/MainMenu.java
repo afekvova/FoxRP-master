@@ -2,6 +2,7 @@ package me.afek.foxrp.menus;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MainMenu implements IMenu {
 
+    FoxRPPlugin plugin = FoxRPPlugin.getInstance();
     Inventory inventory;
     int page = 1;
     boolean deleteMenu;
@@ -42,27 +44,28 @@ public class MainMenu implements IMenu {
     public void onClick(Inventory inventory, ItemStack itemStack, Player player, int slot, ClickType clickType) {
         if (slot == 53 && itemStack != null && itemStack.getType() != Material.AIR) {
             ++page;
-            this.updateInventory();
+            this.updateInventory(player);
         }
 
         if (slot == 45 && itemStack != null && itemStack.getType() != Material.AIR) {
             if (page > 1)
                 --page;
-            this.updateInventory();
+
+            this.updateInventory(player);
         }
     }
 
     public void show(Player player) {
-        this.updateInventory();
+        this.updateInventory(player);
         player.openInventory(this.inventory);
     }
 
-    public void updateInventory() {
+    public void updateInventory(Player player) {
         this.inventory.clear();
         loadItems();
-        List<HeroData> dataList = new ArrayList<>();
-        for (int i = 0; i < 112; i++)
-            dataList.add(new HeroData("&cПроверка", "Giovanka"));
+        List<HeroData> dataList = this.plugin.getDataCommon().getPlayerHeroes(player.getName());
+        if (dataList == null)
+            dataList = new ArrayList<>();
         int size = dataList.size();
         int index = page * 36 - 36 > size ? 1 : page * 36 - 36;
         int endIndex = Math.min((index + 36), size);
@@ -81,9 +84,8 @@ public class MainMenu implements IMenu {
     }
 
     private ItemStack getHead(HeroData heroData) {
-        ItemStack itemStack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+        ItemStack itemStack = this.plugin.getHeadService().getItem(heroData.getValue());
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-        skullMeta.setOwner(heroData.getValue());
         skullMeta.setDisplayName(StringCommon.color("&c" + heroData.getName()));
         itemStack.setItemMeta(skullMeta);
         return itemStack;
