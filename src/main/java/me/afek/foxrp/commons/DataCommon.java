@@ -1,19 +1,31 @@
 package me.afek.foxrp.commons;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.objects.HeroData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataCommon {
 
-    @Getter
-    private final ConcurrentHashMap<String, List<HeroData>> playerData;
+    ConcurrentHashMap<String, List<HeroData>> playerData = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, HeroData> enterNewHero = new ConcurrentHashMap<>();
 
-    public DataCommon() {
-        this.playerData = new ConcurrentHashMap<>();
+    public void addNewHero(String name, HeroData data) {
+        this.enterNewHero.put(name.toLowerCase(), data);
+    }
+
+    public HeroData getNewHero(String name) {
+        return this.enterNewHero.getOrDefault(name.toLowerCase(), null);
+    }
+
+    public void removeNewHero(String name) {
+        this.enterNewHero.remove(name.toLowerCase());
     }
 
     public void addPlayerHero(String name, HeroData heroData) {
@@ -39,5 +51,6 @@ public class DataCommon {
 
     public void clearAll() {
         this.playerData.clear();
+        this.enterNewHero.clear();
     }
 }
