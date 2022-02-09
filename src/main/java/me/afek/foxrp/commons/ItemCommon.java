@@ -1,6 +1,6 @@
 package me.afek.foxrp.commons;
 
-import me.afek.foxrp.FoxRPPlugin;
+import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,7 +20,8 @@ public class ItemCommon {
         } else {
             if (materialId.startsWith("basehead-")) {
                 String[] parts = materialId.split("-");
-                itemStack = FoxRPPlugin.getInstance().getHeadService().getItem(parts[1]);
+                itemStack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+                BukkitHeadAPI.setSkull(itemStack, parts[1]);
             } else {
                 itemStack = new ItemStack(Material.getMaterial(materialId), amount);
             }

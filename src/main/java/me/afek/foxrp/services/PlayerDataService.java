@@ -31,7 +31,7 @@ public class PlayerDataService {
         if (cdFile.length() == 0)
             return;
 
-        Type type = new TypeToken<Map<String, String>>() {
+        Type type = new TypeToken<Map<String, List<String>>>() {
         }.getType();
         Map<String, List<String>> tempMap;
         try {
