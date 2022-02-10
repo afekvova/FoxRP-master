@@ -3,6 +3,9 @@ package me.afek.foxrp.listeners;
 import lombok.RequiredArgsConstructor;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.objects.HeroData;
+import net.skinsrestorer.api.SkinsRestorerAPI;
+import net.skinsrestorer.api.exception.SkinRequestException;
+import net.skinsrestorer.api.property.IProperty;
 import net.skinsrestorer.shared.utils.C;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +18,7 @@ public class PlayerListener implements Listener {
     private final DataCommon dataCommon;
 
     @EventHandler
-    public void playerChat(AsyncPlayerChatEvent event) {
+    public void playerChat(AsyncPlayerChatEvent event) throws SkinRequestException {
         Player player = event.getPlayer();
         String message = event.getMessage();
         HeroData heroData = this.dataCommon.getNewHero(player.getName());
@@ -47,7 +50,8 @@ public class PlayerListener implements Listener {
                 return;
             }
 
-            heroData.setValue(message);
+            IProperty property = SkinsRestorerAPI.getApi().genSkinUrl(message, "steve");
+            heroData.setValue(property.getValue());
             this.dataCommon.removeNewHero(player.getName());
             this.dataCommon.addPlayerHero(player.getName(), heroData);
             player.sendMessage("Вы успешно добавили скин!");

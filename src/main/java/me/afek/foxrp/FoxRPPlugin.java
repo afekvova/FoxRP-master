@@ -7,8 +7,8 @@ import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.OpenMenuCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.listeners.PlayerListener;
+import me.afek.foxrp.objects.HeroData;
 import me.afek.foxrp.services.PlayerDataService;
-import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -48,10 +48,10 @@ public final class FoxRPPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
-        SkinsRestorerAPI.getApi().applySkin();
-//        this.dataCommon.addNewHero(sender.getName(), new HeroData(null, null));
-//        player.sendMessage("Напиши в чат ник!");
-//        player.sendMessage("Если хотите отменить добавление, напишите 'отменить'!");
+//        SkinsRestorerAPI.getApi().applySkin(player.getName(), new BukkitProperty(player.getName(), ));
+        this.dataCommon.addNewHero(sender.getName(), new HeroData(null, null));
+        player.sendMessage("Напиши в чат ник!");
+        player.sendMessage("Если хотите отменить добавление, напишите 'отменить'!");
         return true;
     }
 

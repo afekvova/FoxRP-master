@@ -5,7 +5,10 @@ import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.objects.HeroData;
+import net.skinsrestorer.api.PlayerWrapper;
+import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
+import net.skinsrestorer.api.property.BukkitProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -60,7 +63,7 @@ public class MainMenu implements IMenu {
             HeroData heroData = this.plugin.getDataCommon().getPlayerHeroes(player.getName()).get(index);
             if (heroData == null) return;
 
-            System.out.println(heroData.getName());
+            SkinsRestorerAPI.getApi().applySkin(new PlayerWrapper(player), new BukkitProperty(player.getName(), heroData.getValue()));
         }
     }
 

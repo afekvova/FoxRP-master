@@ -12,5 +12,5 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class HeroData {
 
-    String name, value;
+    String name, value, signature;
 }

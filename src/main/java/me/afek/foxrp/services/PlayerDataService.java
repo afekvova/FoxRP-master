@@ -43,7 +43,7 @@ public class PlayerDataService {
         tempMap.forEach((name, value) -> {
             List<HeroData> heroData = value.stream().map(hero -> {
                 String[] split = hero.split(":");
-                return new HeroData(split[0], split[1]);
+                return new HeroData(split[0], split[1], split[2]);
             }).collect(Collectors.toList());
             this.dataCommon.addPlayerHeroes(name.toLowerCase(), heroData);
         });
@@ -52,7 +52,7 @@ public class PlayerDataService {
     public void savePlayerData() {
         Map<String, List<String>> tempMap = new HashMap<>();
         for (Map.Entry<String, List<HeroData>> stringListEntry : this.dataCommon.getPlayerData().entrySet())
-            tempMap.put(stringListEntry.getKey(), stringListEntry.getValue().stream().map(hero -> hero.getName() + ":" + hero.getValue()).collect(Collectors.toList()));
+            tempMap.put(stringListEntry.getKey(), stringListEntry.getValue().stream().map(hero -> hero.getName() + ":" + hero.getValue() + ":" + hero.getSignature()).collect(Collectors.toList()));
 
         try {
             Files.write(cdFile.toPath(), gson.toJson(tempMap).getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
