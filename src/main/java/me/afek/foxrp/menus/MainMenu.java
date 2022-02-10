@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
 public class MainMenu implements IMenu {
 
     private final FoxRPPlugin plugin = FoxRPPlugin.getInstance();
-    private final Inventory inventory;
-    private final boolean deleteMenu;
+    private Inventory inventory;
+    private boolean deleteMenu;
     private int page = 1;
 
     public MainMenu(boolean deleteMenu) {
-        this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color("&cВыберите персонажа"));
+        this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(deleteMenu ? "Выберите персонажа для удаления" : "&cВыберите персонажа"));
         this.loadItems();
         this.deleteMenu = deleteMenu;
     }
@@ -60,9 +60,26 @@ public class MainMenu implements IMenu {
             return;
         }
 
+        if (slot == 5 && itemStack != null && itemStack.getType() != Material.AIR) {
+            this.deleteMenu = true;
+            this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color("Выберите персонажа для удаления"));
+
+            player.closeInventory();
+            this.show(player);
+            return;
+        }
+
         if (itemStack.getType() == Material.SKULL_ITEM) {
             int index = slot - 9 + (36 * (this.page - 1));
-            HeroData heroData = this.plugin.getDataCommon().getPlayerHeroes(player.getName()).get(index);
+            List<HeroData> playerData = this.plugin.getDataCommon().getPlayerHeroes(player.getName());
+
+            if (this.deleteMenu) {
+                playerData.remove(index);
+                player.closeInventory();
+                return;
+            }
+
+            HeroData heroData = playerData.get(index);
             if (heroData == null) return;
 
             SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
@@ -76,6 +93,7 @@ public class MainMenu implements IMenu {
             } catch (SkinRequestException e) {
                 e.printStackTrace();
             }
+
             player.closeInventory();
         }
     }
