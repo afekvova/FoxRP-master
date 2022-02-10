@@ -11,6 +11,7 @@ import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.BukkitProperty;
 import net.skinsrestorer.api.property.IProperty;
+import net.skinsrestorer.bukkit.SkinsRestorer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MainMenu implements IMenu {
@@ -69,12 +71,39 @@ public class MainMenu implements IMenu {
             return;
         }
 
+        SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+
+        if (slot == 4 && itemStack != null && itemStack.getType() != Material.AIR) {
+            Bukkit.getScheduler().runTaskAsynchronously(FoxRPPlugin.getInstance(), () -> {
+                skinsRestorerAPI.removeSkin(player.getName());
+
+                try {
+                    Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(player.getName());
+                    skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), defaultSkin.get(),
+                            (System.currentTimeMillis() + 3153600000000L));
+                    skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
+                    skinsRestorerAPI.applySkin(new PlayerWrapper(player), defaultSkin.get());
+                    try {
+                        skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+                    } catch (SkinRequestException e) {
+                        e.printStackTrace();
+                    }
+                } catch (SkinRequestException e) {
+                    skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
+                    SkinsRestorer.getInstance().getSkinApplierBukkit().updateSkin(player);
+                }
+            });
+
+            return;
+        }
+
         if (itemStack.getType() == Material.SKULL_ITEM) {
             int index = slot - 9 + (36 * (this.page - 1));
             List<HeroData> playerData = this.plugin.getDataCommon().getPlayerHeroes(player.getName());
 
             if (this.deleteMenu) {
                 playerData.remove(index);
+                player.sendMessage("Вы успешно удалили скин!");
                 player.closeInventory();
                 return;
             }
@@ -82,7 +111,6 @@ public class MainMenu implements IMenu {
             HeroData heroData = playerData.get(index);
             if (heroData == null) return;
 
-            SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
             IProperty property = new BukkitProperty(player.getName(), heroData.getValue(), heroData.getSignature());
             skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), property,
                     (System.currentTimeMillis() + 3153600000000L));
