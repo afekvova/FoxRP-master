@@ -18,7 +18,7 @@ public class PlayerListener implements Listener {
     private final DataCommon dataCommon;
 
     @EventHandler
-    public void playerChat(AsyncPlayerChatEvent event) throws SkinRequestException {
+    public void playerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String message = event.getMessage();
         HeroData heroData = this.dataCommon.getNewHero(player.getName());
@@ -50,8 +50,15 @@ public class PlayerListener implements Listener {
                 return;
             }
 
-            IProperty property = SkinsRestorerAPI.getApi().genSkinUrl(message, "steve");
+            IProperty property = null;
+            try {
+                property = SkinsRestorerAPI.getApi().genSkinUrl(message, "steve");
+            } catch (SkinRequestException e) {
+                player.sendMessage("Это не ссылка!");
+                return;
+            }
             heroData.setValue(property.getValue());
+            heroData.setSignature(property.getSignature());
             this.dataCommon.removeNewHero(player.getName());
             this.dataCommon.addPlayerHero(player.getName(), heroData);
             player.sendMessage("Вы успешно добавили скин!");

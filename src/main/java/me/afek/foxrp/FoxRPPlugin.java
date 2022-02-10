@@ -49,7 +49,7 @@ public final class FoxRPPlugin extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Player player = (Player) sender;
 //        SkinsRestorerAPI.getApi().applySkin(player.getName(), new BukkitProperty(player.getName(), ));
-        this.dataCommon.addNewHero(sender.getName(), new HeroData(null, null));
+        this.dataCommon.addNewHero(sender.getName(), new HeroData(null, null, null));
         player.sendMessage("Напиши в чат ник!");
         player.sendMessage("Если хотите отменить добавление, напишите 'отменить'!");
         return true;

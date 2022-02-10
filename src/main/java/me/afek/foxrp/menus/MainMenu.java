@@ -8,7 +8,9 @@ import me.afek.foxrp.objects.HeroData;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
+import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.BukkitProperty;
+import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -63,7 +65,18 @@ public class MainMenu implements IMenu {
             HeroData heroData = this.plugin.getDataCommon().getPlayerHeroes(player.getName()).get(index);
             if (heroData == null) return;
 
-            SkinsRestorerAPI.getApi().applySkin(new PlayerWrapper(player), new BukkitProperty(player.getName(), heroData.getValue()));
+            SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+            IProperty property = new BukkitProperty(player.getName(), heroData.getValue(), heroData.getSignature());
+            skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), property,
+                    (System.currentTimeMillis() + 3153600000000L));
+            skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
+            skinsRestorerAPI.applySkin(new PlayerWrapper(player), property);
+            try {
+                skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+            } catch (SkinRequestException e) {
+                e.printStackTrace();
+            }
+            player.closeInventory();
         }
     }
 
