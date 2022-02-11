@@ -5,12 +5,10 @@ import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.objects.HeroData;
-import net.skinsrestorer.api.PlayerWrapper;
-import net.skinsrestorer.api.SkinsRestorerAPI;
+import me.afek.foxrp.services.EssentialsService;
+import me.afek.foxrp.services.SkinsRestorerService;
 import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
-import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.BukkitProperty;
-import net.skinsrestorer.api.property.IProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,6 +24,9 @@ import java.util.stream.Collectors;
 public class MainMenu implements IMenu {
 
     private final FoxRPPlugin plugin = FoxRPPlugin.getInstance();
+    private final EssentialsService essentialsService = plugin.getEssentialsService();
+    private final SkinsRestorerService skinsRestorerService = plugin.getSkinsRestorerService();
+
     private Inventory inventory;
     private boolean deleteMenu;
     private int page = 1;
@@ -69,19 +70,17 @@ public class MainMenu implements IMenu {
             return;
         }
 
-        SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
+        if (slot == 3 && itemStack != null && itemStack.getType() != Material.AIR) {
+            this.plugin.getDataCommon().addNewHero(player.getName(), new HeroData(null, null, null));
+            player.closeInventory();
+            player.sendMessage("Напиши в чат ник!");
+            player.sendMessage("Если хотите отменить добавление, напишите 'отменить'!");
+            return;
+        }
 
         if (slot == 4 && itemStack != null && itemStack.getType() != Material.AIR) {
-            Bukkit.getScheduler().runTaskAsynchronously(FoxRPPlugin.getInstance(), () -> {
-                skinsRestorerAPI.removeSkin(player.getName());
-
-                try {
-
-                } catch (SkinRequestException e) {
-                    
-                }
-            });
-
+            this.skinsRestorerService.removeSkin(player);
+            this.skinsRestorerService.setDefaultSkin(player);
             return;
         }
 
@@ -99,18 +98,10 @@ public class MainMenu implements IMenu {
             HeroData heroData = playerData.get(index);
             if (heroData == null) return;
 
-            IProperty property = new BukkitProperty(player.getName(), heroData.getValue(), heroData.getSignature());
-            skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), property,
-                    (System.currentTimeMillis() + 3153600000000L));
-            skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
-            skinsRestorerAPI.applySkin(new PlayerWrapper(player), property);
-            try {
-                skinsRestorerAPI.applySkin(new PlayerWrapper(player));
-            } catch (SkinRequestException e) {
-                e.printStackTrace();
+            if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), heroData.getValue(), heroData.getSignature()))) {
+                this.essentialsService.setPlayerName(player, heroData.getName());
+                player.closeInventory();
             }
-
-            player.closeInventory();
         }
     }
 

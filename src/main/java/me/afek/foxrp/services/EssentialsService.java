@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.User;
 import com.earth2me.essentials.utils.FormatUtil;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Player;
 
 import java.util.Iterator;
 import java.util.Locale;
@@ -13,7 +14,11 @@ public class EssentialsService {
 
     private final Essentials essentials;
 
-    protected boolean setPlayerName(User target, String name) {
+    public boolean setPlayerName(Player player, String name) {
+        return this.setPlayerName(this.essentials.getUser(player), name);
+    }
+
+    public boolean setPlayerName(User target, String name) {
         if (name == null || name.isEmpty() || "off".equalsIgnoreCase(name)) {
             this.setNickname(target, null);
         } else if (target.getName().equalsIgnoreCase(name)) {

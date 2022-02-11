@@ -17,6 +17,27 @@ public class SkinsRestorerService {
     SkinsRestorerAPI skinsRestorerAPI = SkinsRestorerAPI.getApi();
     SkinsRestorer skinsRestorer = SkinsRestorer.getInstance();
 
+    public boolean setDefaultSkin(Player player) {
+        IProperty property = this.getMojangSkin(player);
+        if (property == null) return false;
+        this.setSkin(player, property);
+        return true;
+    }
+
+    public IProperty getMojangSkin(Player player) {
+        try {
+            return this.skinsRestorer.getMojangAPI().getSkin(player.getName()).get();
+        } catch (SkinRequestException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void removeSkin(Player player) {
+        skinsRestorerAPI.removeSkin(player.getName());
+    }
+
     public boolean setSkin(Player player, String name) {
         try {
             Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(player.getName());
@@ -47,5 +68,6 @@ public class SkinsRestorerService {
     public boolean clearSkin(Player player) {
         skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
         SkinsRestorer.getInstance().getSkinApplierBukkit().updateSkin(player);
+        return true;
     }
 }
