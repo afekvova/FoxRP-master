@@ -79,15 +79,7 @@ public class MainMenu implements IMenu {
 
                 try {
                     Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(player.getName());
-                    skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), defaultSkin.get(),
-                            (System.currentTimeMillis() + 3153600000000L));
-                    skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
-                    skinsRestorerAPI.applySkin(new PlayerWrapper(player), defaultSkin.get());
-                    try {
-                        skinsRestorerAPI.applySkin(new PlayerWrapper(player));
-                    } catch (SkinRequestException e) {
-                        e.printStackTrace();
-                    }
+
                 } catch (SkinRequestException e) {
                     skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
                     SkinsRestorer.getInstance().getSkinApplierBukkit().updateSkin(player);
