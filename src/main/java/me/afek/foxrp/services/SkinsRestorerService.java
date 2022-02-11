@@ -43,4 +43,9 @@ public class SkinsRestorerService {
 
         return true;
     }
+
+    public boolean clearSkin(Player player) {
+        skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
+        SkinsRestorer.getInstance().getSkinApplierBukkit().updateSkin(player);
+    }
 }

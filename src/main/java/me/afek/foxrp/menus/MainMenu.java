@@ -11,7 +11,6 @@ import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.BukkitProperty;
 import net.skinsrestorer.api.property.IProperty;
-import net.skinsrestorer.bukkit.SkinsRestorer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,7 +21,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MainMenu implements IMenu {
@@ -78,11 +76,9 @@ public class MainMenu implements IMenu {
                 skinsRestorerAPI.removeSkin(player.getName());
 
                 try {
-                    Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(player.getName());
 
                 } catch (SkinRequestException e) {
-                    skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
-                    SkinsRestorer.getInstance().getSkinApplierBukkit().updateSkin(player);
+                    
                 }
             });
 
