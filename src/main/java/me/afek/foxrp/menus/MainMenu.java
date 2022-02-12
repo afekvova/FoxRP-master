@@ -47,13 +47,14 @@ public class MainMenu implements IMenu {
 
     @Override
     public void onClick(Inventory inventory, ItemStack itemStack, Player player, int slot, ClickType clickType) {
-        if (slot == 53 && itemStack != null && itemStack.getType() != Material.AIR) {
+        if (itemStack == null) return;
+        if (slot == 53 && itemStack.getType() != Material.AIR) {
             ++page;
             this.updateInventory(player);
             return;
         }
 
-        if (slot == 45 && itemStack != null && itemStack.getType() != Material.AIR) {
+        if (slot == 45 && itemStack.getType() != Material.AIR) {
             if (page > 1)
                 --page;
 
@@ -61,7 +62,7 @@ public class MainMenu implements IMenu {
             return;
         }
 
-        if (slot == 5 && itemStack != null && itemStack.getType() != Material.AIR) {
+        if (slot == 5 && itemStack.getType() != Material.AIR) {
             this.deleteMenu = true;
             this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color("Выберите персонажа для удаления"));
 
@@ -70,7 +71,7 @@ public class MainMenu implements IMenu {
             return;
         }
 
-        if (slot == 3 && itemStack != null && itemStack.getType() != Material.AIR) {
+        if (slot == 3 && itemStack.getType() != Material.AIR) {
             this.plugin.getDataCommon().addNewHero(player.getName(), new HeroData(null, null, null));
             player.closeInventory();
             player.sendMessage("Напиши в чат ник!");
@@ -78,7 +79,7 @@ public class MainMenu implements IMenu {
             return;
         }
 
-        if (slot == 4 && itemStack != null && itemStack.getType() != Material.AIR) {
+        if (slot == 4 && itemStack.getType() != Material.AIR) {
             this.skinsRestorerService.removeSkin(player);
             this.skinsRestorerService.setDefaultSkin(player);
             return;

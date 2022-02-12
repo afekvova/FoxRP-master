@@ -40,15 +40,23 @@ public final class FoxRPPlugin extends JavaPlugin {
         instance = this;
 
         if (getServer().getPluginManager().getPlugin("Essentials") == null) {
+            this.getLogger().severe(String.format("[%s] - Disabled due to no Essentials dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         this.essentials = (Essentials) Essentials.getProvidingPlugin(Essentials.class);
+        this.essentialsService = new EssentialsService(this.essentials);
+        this.skinsRestorerService = new SkinsRestorerService();
 
         this.dataCommon = new DataCommon();
         this.playerDataService = new PlayerDataService(this, this.dataCommon);
 
         this.registerListeners();
+        this.registerCommands();
+    }
+
+    private void registerCommands() {
         this.getCommand("test").setExecutor(this);
         this.getCommand("openmenu").setExecutor(new OpenMenuCommand());
     }
