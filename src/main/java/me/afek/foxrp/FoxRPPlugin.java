@@ -1,29 +1,29 @@
 package me.afek.foxrp;
 
 import com.earth2me.essentials.Essentials;
-import com.earth2me.essentials.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.OpenMenuCommand;
 import me.afek.foxrp.commons.DataCommon;
+import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.listeners.PlayerListener;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.PlayerDataService;
 import me.afek.foxrp.services.SkinsRestorerService;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public final class FoxRPPlugin extends JavaPlugin {
 
     @Getter
     static FoxRPPlugin instance;
+
     @Getter
     DataCommon dataCommon;
     @Getter
@@ -45,6 +45,8 @@ public final class FoxRPPlugin extends JavaPlugin {
             return;
         }
 
+        Settings.IMP.reload(new File(this.getDataFolder(), "config.yml"));
+
         this.essentials = (Essentials) Essentials.getProvidingPlugin(Essentials.class);
         this.essentialsService = new EssentialsService(this.essentials);
         this.skinsRestorerService = new SkinsRestorerService();
@@ -57,7 +59,6 @@ public final class FoxRPPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("test").setExecutor(this);
         this.getCommand("openmenu").setExecutor(new OpenMenuCommand());
     }
 
@@ -65,17 +66,6 @@ public final class FoxRPPlugin extends JavaPlugin {
         PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new InventoryListener(), this);
         pluginManager.registerEvents(new PlayerListener(this.dataCommon), this);
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player player = (Player) sender;
-//        SkinsRestorerAPI.getApi().applySkin(player.getName(), new BukkitProperty(player.getName(), ));
-
-        User user = essentials.getUser(player);
-        user.setNickname("&cTEST");
-        user.setDisplayNick();
-        return true;
     }
 
     @Override
