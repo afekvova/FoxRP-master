@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
-import me.afek.foxrp.commands.OpenMenuCommand;
+import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.listeners.PlayerListener;
@@ -59,7 +59,7 @@ public final class FoxRPPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("openmenu").setExecutor(new OpenMenuCommand());
+        this.getCommand("character").setExecutor(new СharacterCommand());
     }
 
     private void registerListeners() {

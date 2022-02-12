@@ -2,7 +2,7 @@ package me.afek.foxrp.listeners;
 
 import lombok.RequiredArgsConstructor;
 import me.afek.foxrp.commons.DataCommon;
-import me.afek.foxrp.objects.HeroData;
+import me.afek.foxrp.objects.CharacterData;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
@@ -21,30 +21,30 @@ public class PlayerListener implements Listener {
     public void playerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String message = event.getMessage();
-        HeroData heroData = this.dataCommon.getNewHero(player.getName());
-        if (heroData == null) return;
+        CharacterData CharacterData = this.dataCommon.getNewCharacter(player.getName());
+        if (CharacterData == null) return;
 
         if (message.equalsIgnoreCase("отмена")) {
-            this.dataCommon.removeNewHero(player.getName());
+            this.dataCommon.removeNewCharacter(player.getName());
             player.sendMessage("Вы отменили добавление нового героя!");
             event.setCancelled(true);
             return;
         }
 
         event.setCancelled(true);
-        if (heroData.getName() == null || heroData.getName().isEmpty()) {
+        if (CharacterData.getName() == null || CharacterData.getName().isEmpty()) {
             if (!C.validMojangUsername(message)) {
                 player.sendMessage("Это не ник!");
                 return;
             }
 
-            heroData.setName(message);
+            CharacterData.setName(message);
             player.sendMessage("Вы успешно добавили ник!");
             player.sendMessage("Введите ссылку:");
             return;
         }
 
-        if (heroData.getValue() == null || heroData.getValue().isEmpty()) {
+        if (CharacterData.getValue() == null || CharacterData.getValue().isEmpty()) {
             if (!C.validUrl(message)) {
                 player.sendMessage("Это не ссылка!");
                 return;
@@ -57,10 +57,10 @@ public class PlayerListener implements Listener {
                 player.sendMessage("Это не ссылка!");
                 return;
             }
-            heroData.setValue(property.getValue());
-            heroData.setSignature(property.getSignature());
-            this.dataCommon.removeNewHero(player.getName());
-            this.dataCommon.addPlayerHero(player.getName(), heroData);
+            CharacterData.setValue(property.getValue());
+            CharacterData.setSignature(property.getSignature());
+            this.dataCommon.removeNewCharacter(player.getName());
+            this.dataCommon.addPlayerCharacter(player.getName(), CharacterData);
             player.sendMessage("Вы успешно добавили скин!");
         }
     }

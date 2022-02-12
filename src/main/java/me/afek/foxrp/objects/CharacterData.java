@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class HeroData {
+public class CharacterData {
 
     String name, value, signature;
 }

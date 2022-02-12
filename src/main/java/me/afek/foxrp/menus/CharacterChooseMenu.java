@@ -4,7 +4,7 @@ import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
-import me.afek.foxrp.objects.HeroData;
+import me.afek.foxrp.objects.CharacterData;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.SkinsRestorerService;
 import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MainMenu implements IMenu {
+public class CharacterChooseMenu implements IMenu {
 
     private final FoxRPPlugin plugin = FoxRPPlugin.getInstance();
     private final EssentialsService essentialsService = plugin.getEssentialsService();
@@ -31,7 +31,7 @@ public class MainMenu implements IMenu {
     private boolean deleteMenu;
     private int page = 1;
 
-    public MainMenu(boolean deleteMenu) {
+    public CharacterChooseMenu(boolean deleteMenu) {
         this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(deleteMenu ? "Выберите персонажа для удаления" : "&cВыберите персонажа"));
         this.loadItems();
         this.deleteMenu = deleteMenu;
@@ -72,7 +72,7 @@ public class MainMenu implements IMenu {
         }
 
         if (slot == 3 && itemStack.getType() != Material.AIR) {
-            this.plugin.getDataCommon().addNewHero(player.getName(), new HeroData(null, null, null));
+            this.plugin.getDataCommon().addNewCharacter(player.getName(), new CharacterData(null, null, null));
             player.closeInventory();
             player.sendMessage("Напиши в чат ник!");
             player.sendMessage("Если хотите отменить добавление, напишите 'отменить'!");
@@ -82,12 +82,13 @@ public class MainMenu implements IMenu {
         if (slot == 4 && itemStack.getType() != Material.AIR) {
             this.skinsRestorerService.removeSkin(player);
             this.skinsRestorerService.setDefaultSkin(player);
+            this.essentialsService.setPlayerName(player, null);
             return;
         }
 
         if (itemStack.getType() == Material.SKULL_ITEM) {
             int index = slot - 9 + (36 * (this.page - 1));
-            List<HeroData> playerData = this.plugin.getDataCommon().getPlayerHeroes(player.getName());
+            List<CharacterData> playerData = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
 
             if (this.deleteMenu) {
                 playerData.remove(index);
@@ -96,11 +97,11 @@ public class MainMenu implements IMenu {
                 return;
             }
 
-            HeroData heroData = playerData.get(index);
-            if (heroData == null) return;
+            CharacterData CharacterData = playerData.get(index);
+            if (CharacterData == null) return;
 
-            if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), heroData.getValue(), heroData.getSignature()))) {
-                this.essentialsService.setPlayerName(player, heroData.getName());
+            if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), CharacterData.getValue(), CharacterData.getSignature()))) {
+                this.essentialsService.setPlayerName(player, CharacterData.getName());
                 player.closeInventory();
             }
         }
@@ -113,7 +114,7 @@ public class MainMenu implements IMenu {
 
     public void updateInventory(Player player) {
         loadItems();
-        List<HeroData> dataList = this.plugin.getDataCommon().getPlayerHeroes(player.getName());
+        List<CharacterData> dataList = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
         if (dataList == null)
             dataList = new ArrayList<>();
 
@@ -122,8 +123,8 @@ public class MainMenu implements IMenu {
         int endIndex = Math.min((index + 36), size);
         int slot = 9;
         dataList = dataList.stream().skip(index).limit(endIndex - index).collect(Collectors.toList());
-        for (HeroData heroData : dataList) {
-            inventory.setItem(slot, this.getHead(heroData));
+        for (CharacterData characterData : dataList) {
+            inventory.setItem(slot, this.getHead(characterData));
             ++slot;
         }
 
@@ -134,12 +135,12 @@ public class MainMenu implements IMenu {
             this.inventory.setItem(45, ItemCommon.getItem(Material.ARROW.name(), "&cПред. страница", 1));
     }
 
-    private ItemStack getHead(HeroData heroData) {
+    private ItemStack getHead(CharacterData characterData) {
         ItemStack itemStack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-        skullMeta.setDisplayName(StringCommon.color("&c" + heroData.getName()));
+        skullMeta.setDisplayName(StringCommon.color("&c" + characterData.getName()));
         itemStack.setItemMeta(skullMeta);
-        BukkitHeadAPI.setSkull(itemStack, heroData.getValue());
+        BukkitHeadAPI.setSkull(itemStack, characterData.getValue());
         return itemStack;
     }
 

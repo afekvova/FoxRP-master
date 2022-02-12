@@ -3,7 +3,7 @@ package me.afek.foxrp.commons;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import me.afek.foxrp.objects.HeroData;
+import me.afek.foxrp.objects.CharacterData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,35 +13,52 @@ import java.util.concurrent.ConcurrentHashMap;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataCommon {
 
-    ConcurrentHashMap<String, List<HeroData>> playerData = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, HeroData> enterNewHero = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, List<CharacterData>> playerData = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, CharacterData> enterNewCharacter = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Long> coolDownData = new ConcurrentHashMap<>();
 
-    public void addNewHero(String name, HeroData data) {
-        this.enterNewHero.put(name.toLowerCase(), data);
+    public void addCoolDown(String name, long coolDown) {
+        this.coolDownData.put(name.toLowerCase(), coolDown);
     }
 
-    public HeroData getNewHero(String name) {
-        return this.enterNewHero.getOrDefault(name.toLowerCase(), null);
+    public long getCoolDown(String name) {
+        return this.coolDownData.getOrDefault(name.toLowerCase(), System.currentTimeMillis());
     }
 
-    public void removeNewHero(String name) {
-        this.enterNewHero.remove(name.toLowerCase());
+    public boolean containCoolDown(String name) {
+        return this.coolDownData.containsKey(name.toLowerCase());
     }
 
-    public void addPlayerHero(String name, HeroData heroData) {
-        List<HeroData> playerHeroes = this.playerData.getOrDefault(name.toLowerCase(), null);
-        if (playerHeroes == null)
-            playerHeroes = new ArrayList<>();
-
-        playerHeroes.add(heroData);
-        this.playerData.put(name.toLowerCase(), playerHeroes);
+    public void removeCoolDown(String name) {
+        this.coolDownData.remove(name.toLowerCase());
     }
 
-    public void addPlayerHeroes(String name, List<HeroData> heroData) {
-        this.playerData.put(name.toLowerCase(), heroData);
+    public void addNewCharacter(String name, CharacterData data) {
+        this.enterNewCharacter.put(name.toLowerCase(), data);
     }
 
-    public List<HeroData> getPlayerHeroes(String name) {
+    public CharacterData getNewCharacter(String name) {
+        return this.enterNewCharacter.getOrDefault(name.toLowerCase(), null);
+    }
+
+    public void removeNewCharacter(String name) {
+        this.enterNewCharacter.remove(name.toLowerCase());
+    }
+
+    public void addPlayerCharacter(String name, CharacterData CharacterData) {
+        List<CharacterData> playerCharacteres = this.playerData.getOrDefault(name.toLowerCase(), null);
+        if (playerCharacteres == null)
+            playerCharacteres = new ArrayList<>();
+
+        playerCharacteres.add(CharacterData);
+        this.playerData.put(name.toLowerCase(), playerCharacteres);
+    }
+
+    public void addPlayerCharacteres(String name, List<CharacterData> CharacterData) {
+        this.playerData.put(name.toLowerCase(), CharacterData);
+    }
+
+    public List<CharacterData> getPlayerCharacteres(String name) {
         return this.playerData.getOrDefault(name.toLowerCase(), null);
     }
 
@@ -51,6 +68,7 @@ public class DataCommon {
 
     public void clearAll() {
         this.playerData.clear();
-        this.enterNewHero.clear();
+        this.enterNewCharacter.clear();
+        this.coolDownData.clear();
     }
 }

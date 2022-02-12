@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.commons.DataCommon;
-import me.afek.foxrp.objects.HeroData;
+import me.afek.foxrp.objects.CharacterData;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,9 +41,9 @@ public class PlayerDataService {
             return;
         }
         tempMap.forEach((name, value) -> {
-            List<HeroData> heroData = value.stream().map(hero -> {
+            List<CharacterData> heroData = value.stream().map(hero -> {
                 String[] split = hero.split(":");
-                return new HeroData(split[0], split[1], split[2]);
+                return new CharacterData(split[0], split[1], split[2]);
             }).collect(Collectors.toList());
             this.dataCommon.addPlayerHeroes(name.toLowerCase(), heroData);
         });
@@ -51,7 +51,7 @@ public class PlayerDataService {
 
     public void savePlayerData() {
         Map<String, List<String>> tempMap = new HashMap<>();
-        for (Map.Entry<String, List<HeroData>> stringListEntry : this.dataCommon.getPlayerData().entrySet())
+        for (Map.Entry<String, List<CharacterData>> stringListEntry : this.dataCommon.getPlayerData().entrySet())
             tempMap.put(stringListEntry.getKey(), stringListEntry.getValue().stream().map(hero -> hero.getName() + ":" + hero.getValue() + ":" + hero.getSignature()).collect(Collectors.toList()));
 
         try {

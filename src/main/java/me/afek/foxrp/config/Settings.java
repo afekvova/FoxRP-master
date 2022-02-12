@@ -18,6 +18,7 @@ public class Settings extends Config {
 
     public String PREFIX = "&f[&6FoxRP&f] ";
     public String PERMISSION_MSG = "%prefix%У вас недостаточно прав для этого действия!";
+    
 
     public void reload(File file) {
         load(file);
