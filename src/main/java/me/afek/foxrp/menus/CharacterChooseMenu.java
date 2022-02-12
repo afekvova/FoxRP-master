@@ -4,6 +4,7 @@ import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
+import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.objects.CharacterData;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.SkinsRestorerService;
@@ -32,17 +33,17 @@ public class CharacterChooseMenu implements IMenu {
     private int page = 1;
 
     public CharacterChooseMenu(boolean deleteMenu) {
-        this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(deleteMenu ? "Выберите персонажа для удаления" : "&cВыберите персонажа"));
+        this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(deleteMenu ? Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE : Settings.IMP.MENU_SETTINGS.DISPLAYNAME));
         this.loadItems();
         this.deleteMenu = deleteMenu;
     }
 
     private void loadItems() {
         this.clearItems();
-        this.inventory.setItem(3, ItemCommon.getItem("basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM5MDZkNjg4ZTY1ODAyNTY5ZDk3MDViNTc5YmNlNTZlZGM4NmVhNWMzNmJkZDZkNmZjMzU1MTZhNzdkNCJ9fX0=", "&aСоздать персонажа", 1, "&7", "&7Нажмите, чтобы создать персонажа"));
-        this.inventory.setItem(4, ItemCommon.getItem(Material.BARRIER.name(), "&eОтключить персонажа", 1, "&7", "&7Нажмите, чтобы отключить персонажа"));
-        this.inventory.setItem(5, ItemCommon.getItem("basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmI3OGZhNWRlZmU3MmRlYmNkOWM3NmFiOWY0ZTExNDI1MDQ3OWJiOWI0NGY0Mjg4N2JiZjZmNzM4NjEyYiJ9fX0=", "&cУдалить персонажа", 1, "&7", "&7Нажмите, чтобы удалить персонажа"));
-        this.inventory.setItem(49, ItemCommon.getItem(Material.BOOK.name(), "&cСтраница номер " + this.page, 1));
+        this.inventory.setItem(3, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.LORE));
+        this.inventory.setItem(4, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.LORE));
+        this.inventory.setItem(5, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.LORE));
+        this.inventory.setItem(49, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PAGE_ICON.DISPLAYNAME.replace("%number%", String.valueOf(this.page)), 1, Settings.IMP.MENU_SETTINGS.PAGE_ICON.LORE));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class CharacterChooseMenu implements IMenu {
 
         if (slot == 5 && itemStack.getType() != Material.AIR) {
             this.deleteMenu = true;
-            this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color("Выберите персонажа для удаления"));
+            this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE));
 
             player.closeInventory();
             this.show(player);
@@ -74,8 +75,8 @@ public class CharacterChooseMenu implements IMenu {
         if (slot == 3 && itemStack.getType() != Material.AIR) {
             this.plugin.getDataCommon().addNewCharacter(player.getName(), new CharacterData(null, null, null));
             player.closeInventory();
-            player.sendMessage("Напиши в чат ник!");
-            player.sendMessage("Если хотите отменить добавление, напишите 'отменить'!");
+            player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.START_CRATE));
+            player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE));
             return;
         }
 
@@ -83,14 +84,14 @@ public class CharacterChooseMenu implements IMenu {
             this.skinsRestorerService.removeSkin(player);
             this.skinsRestorerService.setDefaultSkin(player);
             this.essentialsService.setPlayerName(player, null);
+            player.closeInventory();
             return;
         }
 
         if (itemStack.getType() == Material.SKULL_ITEM) {
             if (this.plugin.getDataCommon().containCoolDown(player.getName()) && this.plugin.getDataCommon().getCoolDown(player.getName()) > System.currentTimeMillis() && !this.deleteMenu) {
                 player.closeInventory();
-                player.sendMessage(StringCommon.color("cooldown"));
-                player.sendMessage(StringCommon.formatCountdownTime((this.plugin.getDataCommon().getCoolDown(player.getName()) - System.currentTimeMillis()) / 1000));
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.COOLDOWN_MESSAGE.replace("%time%", StringCommon.formatCountdownTime((this.plugin.getDataCommon().getCoolDown(player.getName()) - System.currentTimeMillis()) / 1000))));
                 return;
             }
 
@@ -99,7 +100,7 @@ public class CharacterChooseMenu implements IMenu {
 
             if (this.deleteMenu) {
                 playerData.remove(index);
-                player.sendMessage("Вы успешно удалили скин!");
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.SUCCESS_DELETE_CHARACTER));
                 player.closeInventory();
                 return;
             }
@@ -111,6 +112,7 @@ public class CharacterChooseMenu implements IMenu {
                 this.essentialsService.setPlayerName(player, characterData.getName());
                 this.plugin.getDataCommon().addCoolDown(player.getName(), System.currentTimeMillis() + 1000 * 30);
                 player.closeInventory();
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.SUCCESS_ENTER_CHARACTER.replace("%nick%", characterData.getName())));
             }
         }
     }
@@ -137,16 +139,17 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (size > endIndex)
-            this.inventory.setItem(53, ItemCommon.getItem(Material.ARROW.name(), "&aСлед. страница", 1));
+            this.inventory.setItem(53, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.LORE));
 
         if (page > 1)
-            this.inventory.setItem(45, ItemCommon.getItem(Material.ARROW.name(), "&cПред. страница", 1));
+            this.inventory.setItem(45, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.LORE));
     }
 
     private ItemStack getHead(CharacterData characterData) {
         ItemStack itemStack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-        skullMeta.setDisplayName(StringCommon.color("&c" + characterData.getName()));
+        skullMeta.setDisplayName(StringCommon.color(Settings.IMP.MENU_SETTINGS.CHARACTER_ICON.DISPLAYNAME.replace("%name%", characterData.getName())));
+        skullMeta.setLore(Settings.IMP.MENU_SETTINGS.CHARACTER_ICON.LORE.stream().map(string -> StringCommon.color(string.replace("%name%", characterData.getName()))).collect(Collectors.toList()));
         itemStack.setItemMeta(skullMeta);
         BukkitHeadAPI.setSkull(itemStack, characterData.getValue());
         return itemStack;

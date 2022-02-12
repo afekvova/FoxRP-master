@@ -2,6 +2,8 @@ package me.afek.foxrp.listeners;
 
 import lombok.RequiredArgsConstructor;
 import me.afek.foxrp.commons.DataCommon;
+import me.afek.foxrp.commons.StringCommon;
+import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.objects.CharacterData;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
@@ -24,9 +26,9 @@ public class PlayerListener implements Listener {
         CharacterData CharacterData = this.dataCommon.getNewCharacter(player.getName());
         if (CharacterData == null) return;
 
-        if (message.equalsIgnoreCase("отмена")) {
+        if (message.equalsIgnoreCase(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE_WORD))) {
             this.dataCommon.removeNewCharacter(player.getName());
-            player.sendMessage("Вы отменили добавление нового героя!");
+            player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE_SUCCESS));
             event.setCancelled(true);
             return;
         }
@@ -34,19 +36,19 @@ public class PlayerListener implements Listener {
         event.setCancelled(true);
         if (CharacterData.getName() == null || CharacterData.getName().isEmpty()) {
             if (!C.validMojangUsername(message)) {
-                player.sendMessage("Это не ник!");
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.INVALID_NICK));
                 return;
             }
 
             CharacterData.setName(message);
-            player.sendMessage("Вы успешно добавили ник!");
-            player.sendMessage("Введите ссылку:");
+            player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.ENTER_NICK_SUCCESS));
+            player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.ENTER_URL));
             return;
         }
 
         if (CharacterData.getValue() == null || CharacterData.getValue().isEmpty()) {
             if (!C.validUrl(message)) {
-                player.sendMessage("Это не ссылка!");
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.INVALID_URL));
                 return;
             }
 
@@ -54,14 +56,14 @@ public class PlayerListener implements Listener {
             try {
                 property = SkinsRestorerAPI.getApi().genSkinUrl(message, "steve");
             } catch (SkinRequestException e) {
-                player.sendMessage("Это не ссылка!");
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.INVALID_URL));
                 return;
             }
             CharacterData.setValue(property.getValue());
             CharacterData.setSignature(property.getSignature());
             this.dataCommon.removeNewCharacter(player.getName());
             this.dataCommon.addPlayerCharacter(player.getName(), CharacterData);
-            player.sendMessage("Вы успешно добавили скин!");
+            player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.CREATE_CHARACTER_SUCCESS));
         }
     }
 }

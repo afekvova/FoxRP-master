@@ -5,12 +5,12 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ItemCommon {
 
-    public static ItemStack getItem(String id, String name, int amount, String... lore) {
+    public static ItemStack getItem(String id, String name, int amount, List<String> lore) {
         ItemStack itemStack;
         String[] idSplit = id.split(":");
         String materialId = idSplit[0];
@@ -29,8 +29,8 @@ public class ItemCommon {
 
         ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName(StringCommon.color(name));
-        if (lore != null && lore.length > 0)
-            meta.setLore(Arrays.stream(lore).map(StringCommon::color).collect(Collectors.toList()));
+        if (lore != null && lore.size() > 0)
+            meta.setLore(lore.stream().map(StringCommon::color).collect(Collectors.toList()));
 
         itemStack.setItemMeta(meta);
         return itemStack;
