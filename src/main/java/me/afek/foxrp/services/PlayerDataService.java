@@ -45,7 +45,7 @@ public class PlayerDataService {
                 String[] split = hero.split(":");
                 return new CharacterData(split[0], split[1], split[2]);
             }).collect(Collectors.toList());
-            this.dataCommon.addPlayerHeroes(name.toLowerCase(), heroData);
+            this.dataCommon.addPlayerCharacteres(name.toLowerCase(), heroData);
         });
     }
 

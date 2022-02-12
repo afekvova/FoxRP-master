@@ -87,6 +87,13 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (itemStack.getType() == Material.SKULL_ITEM) {
+            if (this.plugin.getDataCommon().containCoolDown(player.getName()) && this.plugin.getDataCommon().getCoolDown(player.getName()) > System.currentTimeMillis() && !this.deleteMenu) {
+                player.closeInventory();
+                player.sendMessage(StringCommon.color("cooldown"));
+                player.sendMessage(StringCommon.formatCountdownTime((this.plugin.getDataCommon().getCoolDown(player.getName()) - System.currentTimeMillis()) / 1000));
+                return;
+            }
+
             int index = slot - 9 + (36 * (this.page - 1));
             List<CharacterData> playerData = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
 
@@ -97,11 +104,12 @@ public class CharacterChooseMenu implements IMenu {
                 return;
             }
 
-            CharacterData CharacterData = playerData.get(index);
-            if (CharacterData == null) return;
+            CharacterData characterData = playerData.get(index);
+            if (characterData == null) return;
 
-            if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), CharacterData.getValue(), CharacterData.getSignature()))) {
-                this.essentialsService.setPlayerName(player, CharacterData.getName());
+            if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), characterData.getValue(), characterData.getSignature()))) {
+                this.essentialsService.setPlayerName(player, characterData.getName());
+                this.plugin.getDataCommon().addCoolDown(player.getName(), System.currentTimeMillis() + 1000 * 30);
                 player.closeInventory();
             }
         }

@@ -24,7 +24,7 @@ public class СharacterCommand implements CommandExecutor {
         }
 
         CharacterChooseMenu mainMenu = new CharacterChooseMenu(false);
-        mainMenu.show((Player) sender);
+        mainMenu.show(player);
         return true;
     }
 }
