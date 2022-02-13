@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class PlayerListener implements Listener {
 
     private final DataCommon dataCommon;
-    private final Pattern namePattern = Pattern.compile("^[а-яА-Я_of0-9]+$");
+    private final Pattern namePattern = Pattern.compile("^[а-яА-Я_of]+$");
 
     @EventHandler
     public void playerChat(AsyncPlayerChatEvent event) {
