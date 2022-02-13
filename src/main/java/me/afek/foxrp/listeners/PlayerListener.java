@@ -14,10 +14,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.regex.Pattern;
+
 @RequiredArgsConstructor
 public class PlayerListener implements Listener {
 
     private final DataCommon dataCommon;
+    private final Pattern namePattern = Pattern.compile("^[а-яА-Я_of]+$");
 
     @EventHandler
     public void playerChat(AsyncPlayerChatEvent event) {
@@ -35,7 +38,7 @@ public class PlayerListener implements Listener {
 
         event.setCancelled(true);
         if (CharacterData.getName() == null || CharacterData.getName().isEmpty()) {
-            if (!C.validMojangUsername(message)) {
+            if (!this.validMojangUsername(message)) {
                 player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.INVALID_NICK));
                 return;
             }
@@ -65,5 +68,9 @@ public class PlayerListener implements Listener {
             this.dataCommon.addPlayerCharacter(player.getName(), CharacterData);
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.CREATE_CHARACTER_SUCCESS));
         }
+    }
+
+    private boolean validMojangUsername(String username) {
+        return username.length() > 16 ? false : namePattern.matcher(username).matches();
     }
 }
