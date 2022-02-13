@@ -2,11 +2,13 @@ package me.afek.foxrp.services;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import me.afek.foxrp.FoxRPPlugin;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
 import net.skinsrestorer.bukkit.SkinsRestorer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -51,17 +53,17 @@ public class SkinsRestorerService {
     }
 
     public boolean setSkin(Player player, IProperty property) {
-        skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), property,
-                (System.currentTimeMillis() + 3153600000000L));
-        skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
-        skinsRestorerAPI.applySkin(new PlayerWrapper(player), property);
-        try {
-            skinsRestorerAPI.applySkin(new PlayerWrapper(player));
-        } catch (SkinRequestException exception) {
-            exception.printStackTrace();
-            return false;
-        }
-
+        Bukkit.getScheduler().runTaskAsynchronously(FoxRPPlugin.getInstance(), () -> {
+            skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), property,
+                    (System.currentTimeMillis() + 3153600000000L));
+            skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
+            skinsRestorerAPI.applySkin(new PlayerWrapper(player), property);
+            try {
+                skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+            } catch (SkinRequestException exception) {
+                exception.printStackTrace();
+            }
+        });
         return true;
     }
 
