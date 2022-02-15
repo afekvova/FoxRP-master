@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class PlayerDataService {
 
     private final DataCommon dataCommon;
-    private final Gson gson = new GsonBuilder().create();
+    private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private File cdFile;
 
     public PlayerDataService(FoxRPPlugin plugin, DataCommon dataCommon) {
@@ -40,6 +40,7 @@ public class PlayerDataService {
             e.printStackTrace();
             return;
         }
+        
         tempMap.forEach((name, value) -> {
             List<CharacterData> heroData = value.stream().map(hero -> {
                 String[] split = hero.split(":");
