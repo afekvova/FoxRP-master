@@ -58,14 +58,10 @@ public class SkinsRestorerService {
                     (System.currentTimeMillis() + 3153600000000L));
             skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
             skinsRestorerAPI.applySkin(new PlayerWrapper(player), property);
-            try {
-                skinsRestorerAPI.applySkin(new PlayerWrapper(player));
-            } catch (SkinRequestException exception) {
-                exception.printStackTrace();
-            }
         });
         return true;
     }
+
 
     public boolean clearSkin(Player player) {
         skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
