@@ -81,8 +81,7 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (slot == 4 && itemStack.getType() != Material.AIR) {
-            this.skinsRestorerService.removeSkin(player);
-            this.skinsRestorerService.setDefaultSkin(player);
+            this.skinsRestorerService.clearSkin(player);
             this.essentialsService.setPlayerName(player, null);
             player.closeInventory();
             return;

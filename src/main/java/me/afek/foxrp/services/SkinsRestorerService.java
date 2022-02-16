@@ -2,13 +2,12 @@ package me.afek.foxrp.services;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import me.afek.foxrp.FoxRPPlugin;
 import net.skinsrestorer.api.PlayerWrapper;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
+import net.skinsrestorer.api.property.GenericProperty;
 import net.skinsrestorer.api.property.IProperty;
 import net.skinsrestorer.bukkit.SkinsRestorer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -42,7 +41,7 @@ public class SkinsRestorerService {
 
     public boolean setSkin(Player player, String name) {
         try {
-            Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(player.getName());
+            Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(name);
             this.setSkin(player, defaultSkin.get());
         } catch (SkinRequestException exception) {
             exception.printStackTrace();
@@ -53,19 +52,23 @@ public class SkinsRestorerService {
     }
 
     public boolean setSkin(Player player, IProperty property) {
-        Bukkit.getScheduler().runTaskAsynchronously(FoxRPPlugin.getInstance(), () -> {
-            skinsRestorerAPI.getSkinStorage().setSkinData(player.getName(), property,
-                    (System.currentTimeMillis() + 3153600000000L));
-            skinsRestorerAPI.getSkinStorage().setSkinName(player.getName(), player.getName());
-            skinsRestorerAPI.applySkin(new PlayerWrapper(player), property);
-        });
+        String skinentry = " " + player.getName();
+        if (skinentry.length() > 16)
+            skinentry = skinentry.substring(0, 16);
+
+        try {
+            skinsRestorerAPI.setSkinData(skinentry, new GenericProperty("textures", property.getValue(), property.getSignature()), null);
+            skinsRestorerAPI.setSkin(player.getName(), skinentry);
+            skinsRestorerAPI.applySkin(new PlayerWrapper(player));
+        } catch (SkinRequestException e) {
+            return false;
+        }
         return true;
     }
 
-
     public boolean clearSkin(Player player) {
-        skinsRestorerAPI.applySkin(new PlayerWrapper(player), SkinsRestorer.getInstance().getMojangAPI().createProperty("textures", "", ""));
-        SkinsRestorer.getInstance().getSkinApplierBukkit().updateSkin(player);
+        this.removeSkin(player);
+        this.setDefaultSkin(player);
         return true;
     }
 }
