@@ -10,9 +10,11 @@ import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.Sql;
 import me.afek.foxrp.objects.TicketData;
 import me.afek.foxrp.utils.RandomString;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
@@ -37,14 +39,21 @@ public class TicketGiveCommand implements CommandExecutor {
             return true;
         }
 
-        String player = args[0];
+        String playerName = args[0];
         int diamonds = Integer.parseInt(args[1]);
         long hours = System.currentTimeMillis() + Integer.parseInt(args[2]) * (1000L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 3, args.length)));
 
-        TicketData ticketData = new TicketData(this.randomString.nextString(), player, reason, diamonds, hours);
+        TicketData ticketData = new TicketData("#" + this.randomString.nextString(), playerName, reason, diamonds, hours);
         this.dataCommon.addTicket(ticketData);
         this.sql.saveTicket(ticketData);
+
+        //success messages
+        Player player = Bukkit.getPlayer(playerName);
+        if (player != null || player.isOnline()) {
+            //message
+        }
+
         return true;
     }
 }

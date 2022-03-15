@@ -108,8 +108,8 @@ public class Sql {
         return name.contains("'") || name.contains("\"");
     }
 
-    private void removeTicket(String ticketId) {
-        String sql = "REMOVE FROM `Tickets` WHERE `Ticket` = '" + ticketId.toLowerCase() + "';";
+    public void removeTicket(String ticketId) {
+        String sql = "REMOVE FROM `Tickets` WHERE `Ticket` = '" + ticketId + "';";
         this.removeTicketSql(sql);
     }
 
@@ -132,16 +132,16 @@ public class Sql {
         if (connection != null) {
             this.executor.execute(() -> {
                 final long timestamp = System.currentTimeMillis();
-                String sql = "SELECT `Ticket` FROM `Tickets` where `Ticket` = '" + ticketData.getIdTicket().toLowerCase() + "' LIMIT 1;";
+                String sql = "SELECT `Ticket` FROM `Tickets` where `Ticket` = '" + ticketData.getIdTicket() + "' LIMIT 1;";
                 try (Statement statament = connection.createStatement();
                      ResultSet set = statament.executeQuery(sql)) {
                     if (!set.next()) {
-                        sql = "INSERT INTO `Tickets` (`Ticket`, `Player`, `Diamonds`, `FinalTime`, `Reason`) VALUES ('" + ticketData.getIdTicket().toLowerCase() + "','" + ticketData.getName().toLowerCase() + "',"
+                        sql = "INSERT INTO `Tickets` (`Ticket`, `Player`, `Diamonds`, `FinalTime`, `Reason`) VALUES ('" + ticketData.getIdTicket() + "','" + ticketData.getName().toLowerCase() + "',"
                                 + "'" + ticketData.getDiamonds() + "','" + ticketData.getFinalTime() + "','" + ticketData.getReason() + "');";
                         statament.executeUpdate(sql);
                     } else {
                         sql = "UPDATE `Tickets` SET `Player` = '" + ticketData.getName().toLowerCase() + "', `Diamonds` = '" + ticketData.getDiamonds() + "', `FinalTime` = '" + ticketData.getFinalTime() + "', `Reason` = '" + ticketData.getReason() + "'"
-                                + " where `Ticket` = '" + ticketData.getIdTicket().toLowerCase() + "';";
+                                + " where `Ticket` = '" + ticketData.getIdTicket() + "';";
                         statament.executeUpdate(sql);
                     }
                 } catch (SQLException ex) {

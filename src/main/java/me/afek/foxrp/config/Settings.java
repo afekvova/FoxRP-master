@@ -48,6 +48,20 @@ public class Settings extends Config {
     @Create
     public TICKET_GIVE_COMMAND TICKET_GIVE_COMMAND;
 
+    @Create
+    public TICKET_REMOVE_COMMAND TICKET_REMOVE_COMMAND;
+
+    public static class TICKET_GIVE_COMMAND {
+        public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
+        @Comment("Длина id штрафа")
+        public int TICKET_ID_LENGTH = 8;
+    }
+
+    public static class TICKET_REMOVE_COMMAND {
+        public String USE = "%prefix%/bampremove [id штрафа] - удалить штраф";
+        public String NOT_EXIST = "%prefix%Такой штраф не существует!";
+    }
+
     @Comment({"Настройка менюшки", "", "Как происходит настройка?", "MATERIAL настраивается очень легко:", "1) Можно просто написать материал из игры, список: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html", "2) Можно поставить голову: тут нужно прописать basehead-значение", "  Пример: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM5MDZkNjg4ZTY1ODAyNTY5ZDk3MDViNTc5YmNlNTZlZGM4NmVhNWMzNmJkZDZkNmZjMzU1MTZhNzdkNCJ9fX0=", "3) Айди + дата: Пример 5:1"})
     public static class MENU_SETTINGS {
 
@@ -127,11 +141,6 @@ public class Settings extends Config {
         }
     }
 
-    public static class TICKET_GIVE_COMMAND {
-        public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
-        @Comment("Длина id штрафа")
-        public int TICKET_ID_LENGTH = 8;
-    }
 
     @Create
     public SQL SQL;
