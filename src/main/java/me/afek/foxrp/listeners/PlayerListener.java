@@ -1,10 +1,13 @@
 package me.afek.foxrp.listeners;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.objects.CharacterData;
+import me.afek.foxrp.objects.TicketData;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
@@ -13,14 +16,30 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PlayerListener implements Listener {
 
-    private final DataCommon dataCommon;
-    private final Pattern namePattern = Pattern.compile("^[а-яА-Я_of]+$");
+    DataCommon dataCommon;
+    Pattern namePattern = Pattern.compile("^[а-яА-Я_of]+$");
+
+    @EventHandler
+    public void playerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        String playerName = player.getName();
+
+        TicketData ticketData = this.dataCommon.getTicketByPlayer(playerName);
+        if (ticketData == null) return;
+
+        player.sendMessage("Ticket: " + ticketData.getIdTicket());
+        player.sendMessage("Diamonds: " + ticketData.getDiamonds());
+        player.sendMessage("FinalTime: " + ticketData.getFinalTime());
+        player.sendMessage("Reason: " + ticketData.getReason());
+    }
 
     @EventHandler
     public void playerChat(AsyncPlayerChatEvent event) {

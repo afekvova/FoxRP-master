@@ -19,16 +19,32 @@ public class DataCommon {
     ConcurrentHashMap<String, Long> coolDownData = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, TicketData> ticketDataConcurrentHashMap = new ConcurrentHashMap<>();
 
-    public void addTicket(String idTicket, TicketData ticketData) {
-        this.ticketDataConcurrentHashMap.put(idTicket.toLowerCase(), ticketData);
+    public void addTicket(TicketData ticketData) {
+        this.ticketDataConcurrentHashMap.put(ticketData.getIdTicket().toLowerCase(), ticketData);
     }
 
     public boolean containTicket(String ticketId) {
         return this.ticketDataConcurrentHashMap.containsKey(ticketId.toLowerCase());
     }
 
+    public boolean containTicketByPlayer(String playerName) {
+        playerName = playerName.toLowerCase();
+        for (TicketData ticketData : this.ticketDataConcurrentHashMap.values())
+            if (ticketData.getName().equalsIgnoreCase(playerName)) return true;
+
+        return false;
+    }
+
     public TicketData getTicket(String ticketId) {
         return this.ticketDataConcurrentHashMap.getOrDefault(ticketId.toLowerCase(), null);
+    }
+
+    public TicketData getTicketByPlayer(String playerName) {
+        playerName = playerName.toLowerCase();
+        for (TicketData ticketData : this.ticketDataConcurrentHashMap.values())
+            if (ticketData.getName().equalsIgnoreCase(playerName)) return ticketData;
+
+        return null;
     }
 
     public TicketData removeTicket(String ticketId) {
@@ -88,5 +104,6 @@ public class DataCommon {
         this.characterPlayerData.clear();
         this.enterNewCharacter.clear();
         this.coolDownData.clear();
+        this.ticketDataConcurrentHashMap.clear();
     }
 }

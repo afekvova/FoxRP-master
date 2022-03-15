@@ -8,6 +8,7 @@ import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
+import me.afek.foxrp.database.Sql;
 import me.afek.foxrp.listeners.PlayerListener;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.PlayerDataService;
@@ -34,6 +35,7 @@ public final class FoxRPPlugin extends JavaPlugin {
     EssentialsService essentialsService;
     @Getter
     SkinsRestorerService skinsRestorerService;
+    Sql sql;
 
     @Override
     public void onEnable() {
@@ -54,6 +56,8 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.dataCommon = new DataCommon();
         this.playerDataService = new PlayerDataService(this, this.dataCommon);
 
+        this.sql = new Sql(this, this.dataCommon);
+
         this.registerListeners();
         this.registerCommands();
     }
@@ -72,7 +76,14 @@ public final class FoxRPPlugin extends JavaPlugin {
     public void onDisable() {
         if (this.playerDataService != null)
             this.playerDataService.savePlayerData();
-        if (this.dataCommon != null)
+
+        if (this.dataCommon != null) {
+            if (this.sql != null)
+                this.dataCommon.getTicketDataConcurrentHashMap().values().forEach(this.sql::saveTicket);
             this.dataCommon.clearAll();
+        }
+
+        if (this.sql != null)
+            this.sql.close();
     }
 }

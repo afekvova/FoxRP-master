@@ -96,7 +96,7 @@ public class Sql {
                     continue;
                 }
 
-                this.dataCommon.addTicket(ticket, new TicketData(ticket, player, reason, diamonds, finalTime));
+                this.dataCommon.addTicket(new TicketData(ticket, player, reason, diamonds, finalTime));
                 i++;
             }
 
