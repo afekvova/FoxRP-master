@@ -136,7 +136,7 @@ public class Sql {
                 try (Statement statament = connection.createStatement();
                      ResultSet set = statament.executeQuery(sql)) {
                     if (!set.next()) {
-                        sql = "INSERT INTO `Tickets` (`Ticket`, `Player, `Diamonds`, `FinalTime`, `Reason`) VALUES ('" + ticketData.getIdTicket().toLowerCase() + "','" + ticketData.getName().toLowerCase() + "',"
+                        sql = "INSERT INTO `Tickets` (`Ticket`, `Player`, `Diamonds`, `FinalTime`, `Reason`) VALUES ('" + ticketData.getIdTicket().toLowerCase() + "','" + ticketData.getName().toLowerCase() + "',"
                                 + "'" + ticketData.getDiamonds() + "','" + ticketData.getFinalTime() + "','" + ticketData.getReason() + ");";
                         statament.executeUpdate(sql);
                     } else {
