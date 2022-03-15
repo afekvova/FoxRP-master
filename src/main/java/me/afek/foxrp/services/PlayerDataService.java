@@ -40,7 +40,7 @@ public class PlayerDataService {
             e.printStackTrace();
             return;
         }
-        
+
         tempMap.forEach((name, value) -> {
             List<CharacterData> heroData = value.stream().map(hero -> {
                 String[] split = hero.split(":");
@@ -52,7 +52,7 @@ public class PlayerDataService {
 
     public void savePlayerData() {
         Map<String, List<String>> tempMap = new HashMap<>();
-        for (Map.Entry<String, List<CharacterData>> stringListEntry : this.dataCommon.getPlayerData().entrySet())
+        for (Map.Entry<String, List<CharacterData>> stringListEntry : this.dataCommon.getCharacterPlayerData().entrySet())
             tempMap.put(stringListEntry.getKey(), stringListEntry.getValue().stream().map(hero -> hero.getName() + ":" + hero.getValue() + ":" + hero.getSignature()).collect(Collectors.toList()));
 
         try {

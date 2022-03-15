@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.objects.CharacterData;
+import me.afek.foxrp.objects.TicketData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +14,26 @@ import java.util.concurrent.ConcurrentHashMap;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataCommon {
 
-    ConcurrentHashMap<String, List<CharacterData>> playerData = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, List<CharacterData>> characterPlayerData = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, CharacterData> enterNewCharacter = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Long> coolDownData = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, TicketData> ticketDataConcurrentHashMap = new ConcurrentHashMap<>();
+
+    public void addTicket(String idTicket, TicketData ticketData) {
+        this.ticketDataConcurrentHashMap.put(idTicket.toLowerCase(), ticketData);
+    }
+
+    public boolean containTicket(String ticketId) {
+        return this.ticketDataConcurrentHashMap.containsKey(ticketId.toLowerCase());
+    }
+
+    public TicketData getTicket(String ticketId) {
+        return this.ticketDataConcurrentHashMap.getOrDefault(ticketId.toLowerCase(), null);
+    }
+
+    public TicketData removeTicket(String ticketId) {
+        return this.ticketDataConcurrentHashMap.remove(ticketId.toLowerCase());
+    }
 
     public void addCoolDown(String name, long coolDown) {
         this.coolDownData.put(name.toLowerCase(), coolDown);
@@ -46,28 +64,28 @@ public class DataCommon {
     }
 
     public void addPlayerCharacter(String name, CharacterData CharacterData) {
-        List<CharacterData> playerCharacteres = this.playerData.getOrDefault(name.toLowerCase(), null);
+        List<CharacterData> playerCharacteres = this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
         if (playerCharacteres == null)
             playerCharacteres = new ArrayList<>();
 
         playerCharacteres.add(CharacterData);
-        this.playerData.put(name.toLowerCase(), playerCharacteres);
+        this.characterPlayerData.put(name.toLowerCase(), playerCharacteres);
     }
 
     public void addPlayerCharacteres(String name, List<CharacterData> CharacterData) {
-        this.playerData.put(name.toLowerCase(), CharacterData);
+        this.characterPlayerData.put(name.toLowerCase(), CharacterData);
     }
 
     public List<CharacterData> getPlayerCharacteres(String name) {
-        return this.playerData.getOrDefault(name.toLowerCase(), null);
+        return this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
     }
 
     public boolean containPlayer(String name) {
-        return this.playerData.containsKey(name.toLowerCase());
+        return this.characterPlayerData.containsKey(name.toLowerCase());
     }
 
     public void clearAll() {
-        this.playerData.clear();
+        this.characterPlayerData.clear();
         this.enterNewCharacter.clear();
         this.coolDownData.clear();
     }

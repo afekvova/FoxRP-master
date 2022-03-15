@@ -117,6 +117,24 @@ public class Settings extends Config {
         }
     }
 
+    @Create
+    public SQL SQL;
+
+    @Comment("Настройка датабазы")
+    public static class SQL {
+
+        @Comment("Тип датабазы. sqlite или mysql")
+        public String STORAGE_TYPE = "sqlite";
+        @Comment("Через сколько дней удалять игроков из датабазы, которые зашли один раз и больше не заходили. 0 или меньше чтобы отключить")
+        public int PURGE_TIME = 14;
+        @Comment("Настройки для mysql")
+        public String HOSTNAME = "127.0.0.1";
+        public int PORT = 3306;
+        public String USER = "user";
+        public String PASSWORD = "password";
+        public String DATABASE = "database";
+    }
+
     public void reload(File file) {
         load(file);
         save(file);

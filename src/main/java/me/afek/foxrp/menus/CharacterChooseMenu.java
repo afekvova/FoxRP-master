@@ -1,5 +1,8 @@
 package me.afek.foxrp.menus;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
@@ -22,15 +25,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CharacterChooseMenu implements IMenu {
 
-    private final FoxRPPlugin plugin = FoxRPPlugin.getInstance();
-    private final EssentialsService essentialsService = plugin.getEssentialsService();
-    private final SkinsRestorerService skinsRestorerService = plugin.getSkinsRestorerService();
-
-    private Inventory inventory;
-    private boolean deleteMenu;
-    private int page = 1;
+    FoxRPPlugin plugin = FoxRPPlugin.getInstance();
+    EssentialsService essentialsService = plugin.getEssentialsService();
+    SkinsRestorerService skinsRestorerService = plugin.getSkinsRestorerService();
+    
+    @NonFinal
+    Inventory inventory;
+    @NonFinal
+    boolean deleteMenu;
+    @NonFinal
+    int page = 1;
 
     public CharacterChooseMenu(boolean deleteMenu) {
         this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(deleteMenu ? Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE : Settings.IMP.MENU_SETTINGS.DISPLAYNAME));
@@ -48,14 +55,14 @@ public class CharacterChooseMenu implements IMenu {
 
     @Override
     public void onClick(Inventory inventory, ItemStack itemStack, Player player, int slot, ClickType clickType) {
-        if (itemStack == null) return;
-        if (slot == 53 && itemStack.getType() != Material.AIR) {
+        if (itemStack == null || itemStack.getType() != Material.AIR) return;
+        if (slot == 53) {
             ++page;
             this.updateInventory(player);
             return;
         }
 
-        if (slot == 45 && itemStack.getType() != Material.AIR) {
+        if (slot == 45) {
             if (page > 1)
                 --page;
 
@@ -63,7 +70,7 @@ public class CharacterChooseMenu implements IMenu {
             return;
         }
 
-        if (slot == 5 && itemStack.getType() != Material.AIR) {
+        if (slot == 5) {
             this.deleteMenu = true;
             this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE));
 
@@ -72,7 +79,7 @@ public class CharacterChooseMenu implements IMenu {
             return;
         }
 
-        if (slot == 3 && itemStack.getType() != Material.AIR) {
+        if (slot == 3) {
             this.plugin.getDataCommon().addNewCharacter(player.getName(), new CharacterData(null, null, null));
             player.closeInventory();
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.START_CRATE));
@@ -80,7 +87,7 @@ public class CharacterChooseMenu implements IMenu {
             return;
         }
 
-        if (slot == 4 && itemStack.getType() != Material.AIR) {
+        if (slot == 4) {
             this.skinsRestorerService.clearSkin(player);
             this.essentialsService.setPlayerName(player, null);
             player.closeInventory();
