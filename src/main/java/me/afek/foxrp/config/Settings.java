@@ -45,26 +45,36 @@ public class Settings extends Config {
         }
     }
 
+    @Create
+    public TICKET_GIVE_COMMAND TICKET_GIVE_COMMAND;
+
     @Comment({"Настройка менюшки", "", "Как происходит настройка?", "MATERIAL настраивается очень легко:", "1) Можно просто написать материал из игры, список: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html", "2) Можно поставить голову: тут нужно прописать basehead-значение", "  Пример: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM5MDZkNjg4ZTY1ODAyNTY5ZDk3MDViNTc5YmNlNTZlZGM4NmVhNWMzNmJkZDZkNmZjMzU1MTZhNzdkNCJ9fX0=", "3) Айди + дата: Пример 5:1"})
     public static class MENU_SETTINGS {
 
         @Comment("Название инвентаря выбора персонажа")
         public String DISPLAYNAME = "Выберите персонажа";
+
         @Comment("Название инвентаря выбора персонажа для удаления")
         public String DISPLAYNAME_DELETE = "Выберите персонажа для удаления";
 
         @Create
         public CREATE_CHARACTER_ICON CREATE_CHARACTER_ICON;
+
         @Create
         public CLEAR_CHARACTER_ICON CLEAR_CHARACTER_ICON;
+
         @Create
         public DELETE_CHARACTER_ICON DELETE_CHARACTER_ICON;
+
         @Create
         public NEXT_PAGE_ICON NEXT_PAGE_ICON;
+
         @Create
         public PREVIOUS_PAGE_ICON PREVIOUS_PAGE_ICON;
+
         @Create
         public PAGE_ICON PAGE_ICON;
+
         @Create
         public CHARACTER_ICON CHARACTER_ICON;
 
@@ -115,6 +125,12 @@ public class Settings extends Config {
             public String DISPLAYNAME = "&c%name%";
             public List<String> LORE = Arrays.asList("", "&aНажмите, чтобы выбрать данного персонажа!");
         }
+    }
+
+    public static class TICKET_GIVE_COMMAND {
+        public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
+        @Comment("Длина id штрафа")
+        public int TICKET_ID_LENGTH = 8;
     }
 
     @Create

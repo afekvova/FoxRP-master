@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
+import me.afek.foxrp.commands.ticket.TicketGiveCommand;
 import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
@@ -63,6 +64,7 @@ public final class FoxRPPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
+        this.getCommand("bampgive").setExecutor(new TicketGiveCommand(this.sql, this.dataCommon));
         this.getCommand("character").setExecutor(new СharacterCommand());
     }
 

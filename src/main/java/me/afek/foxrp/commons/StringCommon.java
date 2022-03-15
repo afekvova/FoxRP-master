@@ -9,6 +9,15 @@ public class StringCommon {
         return ChatColor.translateAlternateColorCodes('&', string.replace("%prefix%", Settings.IMP.PREFIX));
     }
 
+    public static boolean isStringInt(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
+
     public static String padezh(String ed, String a, String b, String c, int n) {
         if (n < 0)
             n = -n;

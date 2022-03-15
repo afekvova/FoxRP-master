@@ -39,6 +39,10 @@ public class PlayerListener implements Listener {
         player.sendMessage("Diamonds: " + ticketData.getDiamonds());
         player.sendMessage("FinalTime: " + ticketData.getFinalTime());
         player.sendMessage("Reason: " + ticketData.getReason());
+
+        if (ticketData.getFinalTime() <= System.currentTimeMillis()) {
+            player.sendMessage("Tickets");
+        }
     }
 
     @EventHandler
