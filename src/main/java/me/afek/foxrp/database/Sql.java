@@ -52,7 +52,7 @@ public class Sql {
                 Class.forName("org.sqlite.JDBC");
                 connectToDatabase("JDBC:sqlite:" + this.plugin.getDataFolder() + "/database.db", null, null);
             }
-            logger.log(Level.INFO, "[FoxRP] Connected ({0} мс)", System.currentTimeMillis() - start);
+            logger.log(Level.INFO, "[FoxRP] Connected ({0} ms)", System.currentTimeMillis() - start);
             createTable();
             loadTickets();
         } catch (SQLException | ClassNotFoundException e) {
@@ -100,7 +100,7 @@ public class Sql {
                 i++;
             }
 
-            logger.log(Level.INFO, "[FoxRP]  ({0})", i);
+            logger.log(Level.INFO, "[FoxRP] Successfully load tickets from database ({0})", i);
         }
     }
 
