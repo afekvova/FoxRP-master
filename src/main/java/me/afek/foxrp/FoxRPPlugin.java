@@ -21,13 +21,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public final class FoxRPPlugin extends JavaPlugin {
 
     @Getter
     static FoxRPPlugin instance;
 
-    @Getter
     DataCommon dataCommon;
     @Getter
     PlayerDataService playerDataService;
@@ -67,9 +67,9 @@ public final class FoxRPPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("bampplayer").setExecutor(new TicketPlayerCommand(this.sql, this.dataCommon));
+        this.getCommand("bampplayer").setExecutor(new TicketPlayerCommand(this.dataCommon));
         this.getCommand("bampedit").setExecutor(new TicketEditCommand(this.sql, this.dataCommon));
-        this.getCommand("bampinfo").setExecutor(new TicketInfoCommand(this.sql, this.dataCommon));
+        this.getCommand("bampinfo").setExecutor(new TicketInfoCommand(this.dataCommon));
         this.getCommand("bampgive").setExecutor(new TicketGiveCommand(this.sql, this.dataCommon));
         this.getCommand("bampremove").setExecutor(new TicketRemoveCommand(this.sql, this.dataCommon));
         this.getCommand("character").setExecutor(new СharacterCommand());

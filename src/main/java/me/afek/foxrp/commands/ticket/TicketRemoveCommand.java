@@ -39,6 +39,8 @@ public class TicketRemoveCommand implements CommandExecutor {
 
         TicketData ticketData = this.dataCommon.removeTicket(ticketId);
         this.sql.removeTicket(ticketData.getIdTicket());
+        
+        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_REMOVE_COMMAND.SUCCESS.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName())));
         return true;
     }
 }

@@ -9,11 +9,9 @@ import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.Sql;
 import me.afek.foxrp.objects.TicketData;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 
@@ -31,7 +29,6 @@ public class TicketEditCommand implements CommandExecutor {
             return true;
         }
 
-        //give [<ник> <алмазы> <срок> <причина>]
         if (args.length < 5 || !StringCommon.isStringInt(args[2]) || !StringCommon.isStringInt(args[3])) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.USE));
             return true;
@@ -45,18 +42,21 @@ public class TicketEditCommand implements CommandExecutor {
 
         String playerName = args[1];
         int diamonds = Integer.parseInt(args[2]);
-        long hours = System.currentTimeMillis() + Integer.parseInt(args[3]) * (1000L);
+        int hours = Integer.parseInt(args[2]);
+
+        if (hours > Settings.IMP.TICKET_GIVE_COMMAND.MAX_TIME_TICKET || hours < Settings.IMP.TICKET_GIVE_COMMAND.MIN_TIME_TICKET) {
+            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.TIME_ERROR));
+            return true;
+        }
+
+        long hoursStamp = System.currentTimeMillis() + hours * (1000L * 3600L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 4, args.length)));
 
-        TicketData ticketData = new TicketData(ticketId, playerName, reason, diamonds, hours);
+        TicketData ticketData = new TicketData(ticketId, playerName, reason, diamonds, hoursStamp);
         this.dataCommon.addTicket(ticketData);
         this.sql.saveTicket(ticketData);
 
-        //success messages
-        Player player = Bukkit.getPlayer(playerName);
-        if (player == null || !player.isOnline()) return true;
-        //send message
-
+        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.SUCCESS.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName())));
         return true;
     }
 }

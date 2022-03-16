@@ -8,6 +8,7 @@ public class Settings extends Config {
 
     @Ignore
     public static final Settings IMP = new Settings();
+
     @Ignore
     @Final
     public final String HELP = "afek.ru, t.me/afekvova, vk.com/afekvova, github.com/afekvova";
@@ -47,19 +48,51 @@ public class Settings extends Config {
 
     @Create
     public TICKET_GIVE_COMMAND TICKET_GIVE_COMMAND;
-    
-    public static class TICKET_GIVE_COMMAND {
-        public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
-        @Comment("Длина id штрафа")
-        public int TICKET_ID_LENGTH = 8;
-    }
+
+    @Create
+    public TICKET_INFO_COMMAND TICKET_INFO_COMMAND;
 
     @Create
     public TICKET_REMOVE_COMMAND TICKET_REMOVE_COMMAND;
+    @Create
+    public TICKET_PLAYER_COMMAND TICKET_PLAYER_COMMAND;
+
+    public static class TICKET_GIVE_COMMAND {
+        public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
+        @Comment("Максимальное количество времени, которое можно установить для штрафа")
+        public int MAX_TIME_TICKET = 5;
+        @Comment("Минимальное количество времени, которое можно установить для штрафа")
+        public int MIN_TIME_TICKET = 1;
+        public String TIME_ERROR = "%prefix%Вы не можете установить такой количество времени! Макс. - 5, мин. - 1";
+        @Comment("Длина id штрафа")
+        public int TICKET_ID_LENGTH = 8;
+        @Comment({"Placeholders:", "%ticketId% - id штрафа", "%player% - игрок"})
+        public String SUCCESS = "%prefix%Вы успешно выдали штраф (&7%ticketId%&f) игроку &6%player%";
+        @Comment("Отправить ли сообщение игроку")
+        public boolean SEND_PLAYER_MESSAGE = true;
+        @Comment({"Placeholders:", "%ticketId% - id штрафа"})
+        public String PLAYER_MESSAGE = "%prefix%Вам выдали штраф (&7%ticketId%&f)";
+    }
 
     public static class TICKET_REMOVE_COMMAND {
         public String USE = "%prefix%/bampremove [id штрафа] - удалить штраф";
         public String NOT_EXIST = "%prefix%Такой штраф не существует!";
+        public String SUCCESS = "%prefix%Вы успешно удалили штраф (&7%ticketId%&f) игроку &6%player%";
+    }
+
+    public static class TICKET_INFO_COMMAND {
+        public String USE = "%prefix%/bampinfo [id штрафа] - информация о штрафе";
+        public String NOT_EXIST = "%prefix%Такой штраф не существует!";
+        public List<String> MESSAGE = Arrays.asList("&a__________ %ticketId% __________",
+                "&aИгрок: &6%player%",
+                "&aАлмазов: &6%diamonds%",
+                "&aОсталось времени: &6%leftTime%",
+                "&aПричина: &6%reason%");
+    }
+
+    public static class TICKET_PLAYER_COMMAND {
+        public String USE = "%prefix%/bampplayer [Игрок] - узнать информацию о игроке";
+        public String NOT_EXIST = "%prefix%У игрока нету штрафов!";
     }
 
     @Create
@@ -68,6 +101,7 @@ public class Settings extends Config {
     public static class TICKET_EDIT_COMMAND {
         public String USE = "%prefix%/bampedit [id штрафа] [ник] [алмазы] [срок] [причина] - редактировать штраф";
         public String NOT_EXIST = "%prefix%Такой штраф не существует!";
+        public String SUCCESS = "%prefix%Вы успешно изменили штраф (&7%ticketId%&f) игроку &6%player%";
     }
 
     @Comment({"Настройка менюшки", "", "Как происходит настройка?", "MATERIAL настраивается очень легко:", "1) Можно просто написать материал из игры, список: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html", "2) Можно поставить голову: тут нужно прописать basehead-значение", "  Пример: basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYWM5MDZkNjg4ZTY1ODAyNTY5ZDk3MDViNTc5YmNlNTZlZGM4NmVhNWMzNmJkZDZkNmZjMzU1MTZhNzdkNCJ9fX0=", "3) Айди + дата: Пример 5:1"})

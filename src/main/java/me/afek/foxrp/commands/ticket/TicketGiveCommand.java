@@ -33,7 +33,6 @@ public class TicketGiveCommand implements CommandExecutor {
             return true;
         }
 
-        //give [<ник> <алмазы> <срок> <причина>]
         if (args.length < 4 || !StringCommon.isStringInt(args[1]) || !StringCommon.isStringInt(args[2])) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.USE));
             return true;
@@ -41,19 +40,25 @@ public class TicketGiveCommand implements CommandExecutor {
 
         String playerName = args[0];
         int diamonds = Integer.parseInt(args[1]);
-        long hours = System.currentTimeMillis() + Integer.parseInt(args[2]) * (1000L * 3600L);
+        int hours = Integer.parseInt(args[2]);
+
+        if (hours > Settings.IMP.TICKET_GIVE_COMMAND.MAX_TIME_TICKET || hours < Settings.IMP.TICKET_GIVE_COMMAND.MIN_TIME_TICKET) {
+            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.TIME_ERROR));
+            return true;
+        }
+
+        long hoursStamp = System.currentTimeMillis() + hours * (1000L * 3600L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 3, args.length)));
 
-        TicketData ticketData = new TicketData("#" + this.randomString.nextString(), playerName, reason, diamonds, hours);
+        TicketData ticketData = new TicketData("#" + this.randomString.nextString(), playerName, reason, diamonds, hoursStamp);
         this.dataCommon.addTicket(ticketData);
         this.sql.saveTicket(ticketData);
-        sender.sendMessage(ticketData.getIdTicket());
-        
-        //success messages
-        Player player = Bukkit.getPlayer(playerName);
-        if (player == null || !player.isOnline()) return true;
-        //send message
 
+        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.SUCCESS.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName())));
+
+        Player player = Bukkit.getPlayer(playerName);
+        if (player == null || !player.isOnline() || !Settings.IMP.TICKET_GIVE_COMMAND.SEND_PLAYER_MESSAGE) return true;
+        player.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.PLAYER_MESSAGE.replace("%ticketId%", ticketData.getIdTicket())));
         return true;
     }
 }

@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.database.Sql;
 import me.afek.foxrp.objects.TicketData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +15,6 @@ import org.bukkit.command.CommandSender;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketInfoCommand implements CommandExecutor {
 
-    Sql sql;
     DataCommon dataCommon;
 
     @Override
@@ -27,22 +25,18 @@ public class TicketInfoCommand implements CommandExecutor {
         }
 
         if (args.length != 1) {
-            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.USE));
+            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_INFO_COMMAND.USE));
             return true;
         }
 
         String ticketId = args[0];
         if (!this.dataCommon.containTicket(ticketId)) {
-            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.NOT_EXIST));
+            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_INFO_COMMAND.NOT_EXIST));
             return true;
         }
 
         TicketData ticketData = this.dataCommon.getTicket(ticketId);
-        sender.sendMessage(StringCommon.color("&a__________ " + ticketData.getIdTicket() + " __________"));
-        sender.sendMessage(StringCommon.color("&aPlayer name: &6" + ticketData.getName()));
-        sender.sendMessage(StringCommon.color("&aDiamonds: &6" + ticketData.getDiamonds()));
-        sender.sendMessage(StringCommon.color("&aLeft time: &6" + StringCommon.formatCountdownTime((ticketData.getFinalTime() - System.currentTimeMillis()) / 1000L)));
-        sender.sendMessage(StringCommon.color("&aReason: &6" + ticketData.getReason()));
+        Settings.IMP.TICKET_INFO_COMMAND.MESSAGE.forEach(message -> sender.sendMessage(StringCommon.color(message.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName()).replace("%diamonds%", String.valueOf(ticketData.getDiamonds())).replace("%leftTime%", StringCommon.formatCountdownTime((ticketData.getFinalTime() - System.currentTimeMillis()) / 1000L)).replace("%reason%", ticketData.getReason()))));
         return true;
     }
 }
