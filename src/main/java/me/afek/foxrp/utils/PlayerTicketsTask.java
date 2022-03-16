@@ -24,6 +24,7 @@ public class PlayerTicketsTask implements Runnable {
             if (ticketData.getFinalTime() <= System.currentTimeMillis()) {
                 ticketDataIterator.remove();
                 this.sql.removeTicket(ticketData.getIdTicket());
+                //give
             }
         }
     }

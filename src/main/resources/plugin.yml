@@ -8,3 +8,4 @@ website: afek.ru, t.me/afekvova, vk.com/afekvova, github.com/afekvova
 commands:
   character:
   bampgive:
+  bampremove:

@@ -18,6 +18,25 @@ public class DataCommon {
     ConcurrentHashMap<String, CharacterData> enterNewCharacter = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Long> coolDownData = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, TicketData> ticketDataConcurrentHashMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Integer> warningsConcurrentHashMap = new ConcurrentHashMap<>();
+
+    public void addPlayerWarning(String name) {
+        name = name.toLowerCase();
+        int warnings = this.warningsConcurrentHashMap.getOrDefault(name, 0);
+        this.warningsConcurrentHashMap.put(name, ++warnings);
+    }
+
+    public void addPlayerWarning(String name, int warnings) {
+        this.warningsConcurrentHashMap.put(name.toLowerCase(), warnings);
+    }
+
+    public boolean containPlayerWarning(String name) {
+        return this.warningsConcurrentHashMap.containsKey(name.toLowerCase());
+    }
+
+    public int getPlayerWarnings(String name) {
+        return this.warningsConcurrentHashMap.getOrDefault(name.toLowerCase(), 0);
+    }
 
     public void addTicket(TicketData ticketData) {
         this.ticketDataConcurrentHashMap.put(ticketData.getIdTicket().toLowerCase(), ticketData);

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.ticket.TicketGiveCommand;
+import me.afek.foxrp.commands.ticket.TicketRemoveCommand;
 import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
@@ -65,6 +66,7 @@ public final class FoxRPPlugin extends JavaPlugin {
 
     private void registerCommands() {
         this.getCommand("bampgive").setExecutor(new TicketGiveCommand(this.sql, this.dataCommon));
+        this.getCommand("bampremove").setExecutor(new TicketRemoveCommand(this.sql, this.dataCommon));
         this.getCommand("character").setExecutor(new СharacterCommand());
     }
 
@@ -79,11 +81,8 @@ public final class FoxRPPlugin extends JavaPlugin {
         if (this.playerDataService != null)
             this.playerDataService.savePlayerData();
 
-        if (this.dataCommon != null) {
-            if (this.sql != null)
-                this.dataCommon.getTicketDataConcurrentHashMap().values().forEach(this.sql::saveTicket);
+        if (this.dataCommon != null)
             this.dataCommon.clearAll();
-        }
 
         if (this.sql != null)
             this.sql.close();

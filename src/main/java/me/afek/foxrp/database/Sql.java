@@ -21,7 +21,7 @@ public class Sql {
 
     FoxRPPlugin plugin;
     DataCommon dataCommon;
-    ExecutorService executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("DailyRewards-SQL-%d").build());
+    ExecutorService executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("FoxRP-SQL-%d").build());
     Logger logger = Bukkit.getLogger();
 
     @NonFinal
@@ -55,6 +55,7 @@ public class Sql {
             logger.log(Level.INFO, "[FoxRP] Connected ({0} ms)", System.currentTimeMillis() - start);
             createTable();
             loadTickets();
+            loadWarnings();
         } catch (SQLException | ClassNotFoundException e) {
             logger.log(Level.WARNING, "Can not connect to database or execute sql: ", e);
             connection = null;
@@ -74,6 +75,13 @@ public class Sql {
                 + "`Diamonds` INT(10) DEFAULT 0,"
                 + "`FinalTime` BIGINT NOT NULL,"
                 + "`Reason` TEXT);";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.executeUpdate();
+        }
+
+        sql = "CREATE TABLE IF NOT EXISTS `Warnings` ("
+                + "`PlayerName` VARCHAR(16) NOT NULL PRIMARY KEY UNIQUE,"
+                + "`Warns` INT(10) DEFAULT 0);";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
@@ -104,16 +112,42 @@ public class Sql {
         }
     }
 
+    private void loadWarnings() throws SQLException {
+        try (PreparedStatement statament = connection.prepareStatement("SELECT * FROM `Warnings`;");
+             ResultSet set = statament.executeQuery()) {
+            int i = 0;
+            while (set.next()) {
+                String playerName = set.getString("PlayerName");
+                int warnings = set.getInt("Warns");
+
+                if (this.isInvalidName(playerName)) {
+                    this.removeTicket(playerName);
+                    continue;
+                }
+
+                this.dataCommon.addPlayerWarning(playerName, warnings);
+                i++;
+            }
+
+            logger.log(Level.INFO, "[FoxRP] Successfully load warnings from database ({0})", i);
+        }
+    }
+
     private boolean isInvalidName(String name) {
         return name.contains("'") || name.contains("\"");
     }
 
-    public void removeTicket(String ticketId) {
-        String sql = "REMOVE FROM `Tickets` WHERE `Ticket` = '" + ticketId + "';";
-        this.removeTicketSql(sql);
+    public void removeWarning(String playerName) {
+        String sql = "DELETE FROM `Warnings` WHERE `PlayerName` = '" + playerName.toLowerCase() + "';";
+        this.execute(sql);
     }
 
-    private void removeTicketSql(String sql) {
+    public void removeTicket(String ticketId) {
+        String sql = "DELETE FROM `Tickets` WHERE `Ticket` = '" + ticketId + "';";
+        this.execute(sql);
+    }
+
+    private void execute(String sql) {
         if (connection != null) {
             this.executor.execute(() ->
             {
@@ -145,7 +179,33 @@ public class Sql {
                         statament.executeUpdate(sql);
                     }
                 } catch (SQLException ex) {
-                    logger.log(Level.WARNING, "[DailyRewards] Can't query database", ex);
+                    logger.log(Level.WARNING, "[FoxRP] Can't query database", ex);
+                    logger.log(Level.WARNING, sql);
+                    executor.execute(this::setupConnect);
+                }
+            });
+        }
+    }
+
+    public void saveWarning(String playerName, int warnings) {
+        if (connecting || isInvalidName(playerName))
+            return;
+
+        if (connection != null) {
+            this.executor.execute(() -> {
+                final long timestamp = System.currentTimeMillis();
+                String sql = "SELECT `PlayerName` FROM `Warnings` where `PlayerName` = '" + playerName.toLowerCase() + "' LIMIT 1;";
+                try (Statement statament = connection.createStatement();
+                     ResultSet set = statament.executeQuery(sql)) {
+                    if (!set.next()) {
+                        sql = "INSERT INTO `Warnings` (`PlayerName`, `Warns`) VALUES ('" + playerName.toLowerCase() + "','" + warnings + "');";
+                        statament.executeUpdate(sql);
+                    } else {
+                        sql = "UPDATE `Warnings` SET `Warns` = '" + warnings + "' where `PlayerName` = '" + playerName.toLowerCase() + "';";
+                        statament.executeUpdate(sql);
+                    }
+                } catch (SQLException ex) {
+                    logger.log(Level.WARNING, "[FoxRP] Can't query database", ex);
                     logger.log(Level.WARNING, sql);
                     executor.execute(this::setupConnect);
                 }

@@ -35,14 +35,7 @@ public class PlayerListener implements Listener {
         TicketData ticketData = this.dataCommon.getTicketByPlayer(playerName);
         if (ticketData == null) return;
 
-        player.sendMessage("Ticket: " + ticketData.getIdTicket());
-        player.sendMessage("Diamonds: " + ticketData.getDiamonds());
-        player.sendMessage("FinalTime: " + ticketData.getFinalTime());
-        player.sendMessage("Reason: " + ticketData.getReason());
-
-        if (ticketData.getFinalTime() <= System.currentTimeMillis()) {
-            player.sendMessage("Tickets");
-        }
+        //send player message
     }
 
     @EventHandler

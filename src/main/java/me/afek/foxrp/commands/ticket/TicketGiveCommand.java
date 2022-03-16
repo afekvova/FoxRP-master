@@ -50,9 +50,8 @@ public class TicketGiveCommand implements CommandExecutor {
 
         //success messages
         Player player = Bukkit.getPlayer(playerName);
-        if (player != null || player.isOnline()) {
-            //message
-        }
+        if (player == null || !player.isOnline()) return true;
+        //send message
 
         return true;
     }
