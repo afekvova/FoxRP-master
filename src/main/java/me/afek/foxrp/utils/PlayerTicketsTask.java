@@ -7,7 +7,8 @@ import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.database.Sql;
 import me.afek.foxrp.objects.TicketData;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -18,14 +19,18 @@ public class PlayerTicketsTask implements Runnable {
 
     @Override
     public void run() {
-        Iterator<TicketData> ticketDataIterator = this.dataCommon.getTicketDataConcurrentHashMap().values().iterator();
-        if (ticketDataIterator.hasNext()) {
-            TicketData ticketData = ticketDataIterator.next();
+        List<String> removeTicketList = new ArrayList<>();
+        for (TicketData ticketData : this.dataCommon.getTicketDataConcurrentHashMap().values())
             if (ticketData.getFinalTime() <= System.currentTimeMillis()) {
-                ticketDataIterator.remove();
+                removeTicketList.add(ticketData.getIdTicket());
                 this.sql.removeTicket(ticketData.getIdTicket());
-                this.dataCommon.addPlayerWarning(ticketData.getName());
+
+                String playerName = ticketData.getName();
+                this.dataCommon.addPlayerWarning(playerName);
+                this.sql.saveWarning(playerName, this.dataCommon.getPlayerWarnings(playerName));
             }
-        }
+
+        if (!removeTicketList.isEmpty())
+            this.dataCommon.removeAllTicket(removeTicketList);
     }
 }

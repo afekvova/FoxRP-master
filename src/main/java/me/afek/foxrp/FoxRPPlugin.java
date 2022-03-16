@@ -5,10 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
-import me.afek.foxrp.commands.ticket.TicketEditCommand;
-import me.afek.foxrp.commands.ticket.TicketGiveCommand;
-import me.afek.foxrp.commands.ticket.TicketInfoCommand;
-import me.afek.foxrp.commands.ticket.TicketRemoveCommand;
+import me.afek.foxrp.commands.ticket.*;
 import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
@@ -63,13 +60,14 @@ public final class FoxRPPlugin extends JavaPlugin {
 
         this.sql = new Sql(this, this.dataCommon);
 
-        Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.sql), 20L, 20L * 3);
+        Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.sql), 20L, 20L);
 
         this.registerListeners();
         this.registerCommands();
     }
 
     private void registerCommands() {
+        this.getCommand("bampplayer").setExecutor(new TicketPlayerCommand(this.sql, this.dataCommon));
         this.getCommand("bampedit").setExecutor(new TicketEditCommand(this.sql, this.dataCommon));
         this.getCommand("bampinfo").setExecutor(new TicketInfoCommand(this.sql, this.dataCommon));
         this.getCommand("bampgive").setExecutor(new TicketGiveCommand(this.sql, this.dataCommon));

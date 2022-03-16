@@ -66,8 +66,22 @@ public class DataCommon {
         return null;
     }
 
+    public List<TicketData> getTicketsByPlayer(String playerName) {
+        List<TicketData> tickets = new ArrayList<>();
+
+        playerName = playerName.toLowerCase();
+        for (TicketData ticketData : this.ticketDataConcurrentHashMap.values())
+            if (ticketData.getName().equalsIgnoreCase(playerName)) tickets.add(ticketData);
+
+        return tickets;
+    }
+
     public TicketData removeTicket(String ticketId) {
         return this.ticketDataConcurrentHashMap.remove(ticketId);
+    }
+
+    public void removeAllTicket(List<String> tickets) {
+        tickets.forEach(this::removeTicket);
     }
 
     public void addCoolDown(String name, long coolDown) {

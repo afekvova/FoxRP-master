@@ -11,3 +11,4 @@ commands:
   bampremove:
   bampedit:
   bampinfo:
+  bampplayer:
