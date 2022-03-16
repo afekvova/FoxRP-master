@@ -47,18 +47,26 @@ public class Settings extends Config {
 
     @Create
     public TICKET_GIVE_COMMAND TICKET_GIVE_COMMAND;
-
-    @Create
-    public TICKET_REMOVE_COMMAND TICKET_REMOVE_COMMAND;
-
+    
     public static class TICKET_GIVE_COMMAND {
         public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
         @Comment("Длина id штрафа")
         public int TICKET_ID_LENGTH = 8;
     }
 
+    @Create
+    public TICKET_REMOVE_COMMAND TICKET_REMOVE_COMMAND;
+
     public static class TICKET_REMOVE_COMMAND {
         public String USE = "%prefix%/bampremove [id штрафа] - удалить штраф";
+        public String NOT_EXIST = "%prefix%Такой штраф не существует!";
+    }
+
+    @Create
+    public TICKET_EDIT_COMMAND TICKET_EDIT_COMMAND;
+
+    public static class TICKET_EDIT_COMMAND {
+        public String USE = "%prefix%/bampedit [id штрафа] [ник] [алмазы] [срок] [причина] - редактировать штраф";
         public String NOT_EXIST = "%prefix%Такой штраф не существует!";
     }
 

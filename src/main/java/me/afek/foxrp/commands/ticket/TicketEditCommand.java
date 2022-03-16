@@ -9,7 +9,6 @@ import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.Sql;
 import me.afek.foxrp.objects.TicketData;
-import me.afek.foxrp.utils.RandomString;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,35 +19,39 @@ import java.util.Arrays;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class TicketGiveCommand implements CommandExecutor {
+public class TicketEditCommand implements CommandExecutor {
 
     Sql sql;
     DataCommon dataCommon;
-    RandomString randomString = new RandomString(Settings.IMP.TICKET_GIVE_COMMAND.TICKET_ID_LENGTH);
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("foxrp.commands.ticketgive")) {
+        if (!sender.hasPermission("foxrp.commands.ticketedit")) {
             sender.sendMessage(StringCommon.color(Settings.IMP.PERMISSION_MSG));
             return true;
         }
 
         //give [<ник> <алмазы> <срок> <причина>]
-        if (args.length < 4 || !StringCommon.isStringInt(args[1]) || !StringCommon.isStringInt(args[2])) {
-            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.USE));
+        if (args.length < 5 || !StringCommon.isStringInt(args[2]) || !StringCommon.isStringInt(args[3])) {
+            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.USE));
             return true;
         }
 
-        String playerName = args[0];
-        int diamonds = Integer.parseInt(args[1]);
-        long hours = System.currentTimeMillis() + Integer.parseInt(args[2]) * (1000L * 3600L);
-        String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 3, args.length)));
+        String ticketId = args[0];
+        if (!this.dataCommon.containTicket(ticketId)) {
+            sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.NOT_EXIST));
+            return true;
+        }
 
-        TicketData ticketData = new TicketData("#" + this.randomString.nextString(), playerName, reason, diamonds, hours);
+        String playerName = args[1];
+        int diamonds = Integer.parseInt(args[2]);
+        long hours = System.currentTimeMillis() + Integer.parseInt(args[3]) * (1000L);
+        String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 4, args.length)));
+
+        TicketData ticketData = new TicketData(ticketId, playerName, reason, diamonds, hours);
         this.dataCommon.addTicket(ticketData);
         this.sql.saveTicket(ticketData);
-        sender.sendMessage(ticketData.getIdTicket());
-        
+
         //success messages
         Player player = Bukkit.getPlayer(playerName);
         if (player == null || !player.isOnline()) return true;
