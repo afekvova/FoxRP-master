@@ -1,14 +1,3 @@
 name: FoxRP
-version: '${project.version}'
+version: '${version}'
 main: me.afek.foxrp.FoxRPPlugin
-depend: [ SkinsRestorer, Essentials ]
-authors: [ Afek ]
-website: afek.ru, t.me/afekvova, vk.com/afekvova, github.com/afekvova
-
-commands:
-  character:
-  bampgive:
-  bampremove:
-  bampedit:
-  bampinfo:
-  bampplayer:
