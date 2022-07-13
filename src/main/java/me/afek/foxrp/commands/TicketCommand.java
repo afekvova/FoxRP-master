@@ -27,7 +27,7 @@ public class TicketCommand implements CommandExecutor {
     public TicketCommand(FoxStorage foxStorage, DataCommon dataCommon) {
         this.foxStorage = foxStorage;
         this.dataCommon = dataCommon;
-        registerSubCommands();
+        this.registerSubCommands();
     }
 
     private void registerSubCommands() {
@@ -41,13 +41,13 @@ public class TicketCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sendHelp(sender);
+            this.sendHelp(sender);
             return true;
         }
 
         Optional<SubCommand> subCommandOptional = subCommandSet.stream().filter(subCommand -> subCommand.getLabel().equalsIgnoreCase(args[0])).findFirst();
         if (!subCommandOptional.isPresent()) {
-            sendHelp(sender);
+            this.sendHelp(sender);
             return true;
         }
 

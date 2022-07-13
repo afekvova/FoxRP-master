@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.api.menu.IMenu;
+import me.afek.foxrp.commons.CooldownCommon;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
@@ -92,9 +93,9 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (itemStack.getType() == Material.SKULL_ITEM) {
-            if (this.plugin.getDataCommon().containCoolDown(player.getName()) && this.plugin.getDataCommon().getCoolDown(player.getName()) > System.currentTimeMillis() && !this.delete) {
+            if (CooldownCommon.hasCooldown(player.getName(), "choosecharacter") && !this.delete) {
                 player.closeInventory();
-                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.COOLDOWN_MESSAGE.replace("%time%", StringCommon.formatCountdownTime((this.plugin.getDataCommon().getCoolDown(player.getName()) - System.currentTimeMillis()) / 1000))));
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.COOLDOWN_MESSAGE.replace("%time%", StringCommon.formatCountdownTime(CooldownCommon.getCooldown(player.getName(), "choosecharacter")))));
                 return;
             }
 
@@ -108,14 +109,15 @@ public class CharacterChooseMenu implements IMenu {
                 return;
             }
 
-            Character characterData = playerData.get(index);
-            if (characterData == null) return;
+            Character character = playerData.get(index);
+            if (character == null) return;
 
-            if (this.plugin.getSkinsRestorerService().setSkin(player, new BukkitProperty(player.getName(), characterData.getValue(), characterData.getSignature()))) {
-                this.plugin.getEssentialsService().setPlayerName(player, characterData.getName());
-                this.plugin.getDataCommon().addCoolDown(player.getName(), System.currentTimeMillis() + 1000 * 30);
+            if (this.plugin.getSkinsRestorerService().setSkin(player, new BukkitProperty(player.getName(), character.getValue(), character.getSignature()))) {
+                this.plugin.getEssentialsService().setPlayerName(player, character.getName());
+                CooldownCommon.setCooldown(player.getName(), 30 * 1000L, "choosecharacter"); // 30 секунд
+
                 player.closeInventory();
-                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.SUCCESS_ENTER_CHARACTER.replace("%nick%", characterData.getName())));
+                player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.SUCCESS_ENTER_CHARACTER.replace("%nick%", character.getName())));
             }
         }
     }

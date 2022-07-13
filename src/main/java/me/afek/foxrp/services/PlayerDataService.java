@@ -3,6 +3,9 @@ package me.afek.foxrp.services;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.model.Character;
@@ -18,21 +21,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PlayerDataService {
 
-    private final DataCommon dataCommon;
-    private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-    private File cdFile;
+    DataCommon dataCommon;
+    Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    Type type = new TypeToken<Map<String, List<String>>>() {
+    }.getType();
 
+    @NonFinal
+    File cdFile;
+
+    //TODO: Переписать этот калл
     public PlayerDataService(FoxRPPlugin plugin, DataCommon dataCommon) {
-        this.createJsonFile(plugin);
         this.dataCommon = dataCommon;
+        this.createJsonFile(plugin);
 
         if (cdFile.length() == 0)
             return;
 
-        Type type = new TypeToken<Map<String, List<String>>>() {
-        }.getType();
+
         Map<String, List<String>> tempMap;
         try {
             tempMap = gson.fromJson(new String(Files.readAllBytes(cdFile.toPath())), type);
@@ -46,6 +54,7 @@ public class PlayerDataService {
                 String[] split = hero.split(":");
                 return new Character(split[0], split[1], split[2]);
             }).collect(Collectors.toList());
+
             this.dataCommon.addPlayerCharacteres(name.toLowerCase(), heroData);
         });
     }

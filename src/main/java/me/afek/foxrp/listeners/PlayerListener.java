@@ -8,6 +8,7 @@ import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.model.Character;
 import me.afek.foxrp.model.Ticket;
+import net.skinsrestorer.api.SkinVariant;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
@@ -25,17 +26,17 @@ import java.util.regex.Pattern;
 public class PlayerListener implements Listener {
 
     DataCommon dataCommon;
-    Pattern namePattern = Pattern.compile("^[а-яА-Я_of]+$");
+    Pattern NAME_PATTERN = Pattern.compile("^[а-яА-Я_of]+$");
 
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         String playerName = player.getName();
 
-        Ticket ticketData = this.dataCommon.getTicketByPlayer(playerName);
-        if (ticketData == null) return;
+        Ticket ticket = this.dataCommon.getTicketByPlayer(playerName);
+        if (ticket == null) return;
 
-        //send player message
+        //TODO: send player message
     }
 
     @EventHandler
@@ -73,7 +74,7 @@ public class PlayerListener implements Listener {
 
             IProperty property = null;
             try {
-                property = SkinsRestorerAPI.getApi().genSkinUrl(message, "steve");
+                property = SkinsRestorerAPI.getApi().genSkinUrl(message, SkinVariant.CLASSIC);
             } catch (SkinRequestException e) {
                 player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.INVALID_URL));
                 return;
@@ -87,6 +88,6 @@ public class PlayerListener implements Listener {
     }
 
     private boolean validMojangUsername(String username) {
-        return username.length() > 16 ? false : namePattern.matcher(username).matches();
+        return username.length() <= 16 && NAME_PATTERN.matcher(username).matches();
     }
 }

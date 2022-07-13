@@ -16,7 +16,6 @@ public class DataCommon {
 
     ConcurrentHashMap<String, List<Character>> characterPlayerData = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Character> enterNewCharacter = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, Long> coolDownData = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Ticket> ticketDataConcurrentHashMap = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Integer> warningsConcurrentHashMap = new ConcurrentHashMap<>();
 
@@ -84,22 +83,6 @@ public class DataCommon {
         tickets.forEach(this::removeTicket);
     }
 
-    public void addCoolDown(String name, long coolDown) {
-        this.coolDownData.put(name.toLowerCase(), coolDown);
-    }
-
-    public long getCoolDown(String name) {
-        return this.coolDownData.getOrDefault(name.toLowerCase(), System.currentTimeMillis());
-    }
-
-    public boolean containCoolDown(String name) {
-        return this.coolDownData.containsKey(name.toLowerCase());
-    }
-
-    public void removeCoolDown(String name) {
-        this.coolDownData.remove(name.toLowerCase());
-    }
-
     public void addNewCharacter(String name, Character data) {
         this.enterNewCharacter.put(name.toLowerCase(), data);
     }
@@ -136,7 +119,6 @@ public class DataCommon {
     public void clearAll() {
         this.characterPlayerData.clear();
         this.enterNewCharacter.clear();
-        this.coolDownData.clear();
         this.ticketDataConcurrentHashMap.clear();
     }
 }

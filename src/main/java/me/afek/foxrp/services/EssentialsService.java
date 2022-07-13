@@ -6,7 +6,6 @@ import com.earth2me.essentials.utils.FormatUtil;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
 import java.util.Locale;
 
 @RequiredArgsConstructor
@@ -19,43 +18,30 @@ public class EssentialsService {
     }
 
     public boolean setPlayerName(User target, String name) {
-        if (name == null || name.isEmpty() || "off".equalsIgnoreCase(name)) {
-            this.setNickname(target, null);
-        } else if (target.getName().equalsIgnoreCase(name)) {
-            this.setNickname(target, name);
-        } else {
-            if (this.nickInUse(target, name))
-                return false;
+        if (this.nickInUse(target, name))
+            return false;
 
-            this.setNickname(target, name);
-        }
-
+        this.setNickName(target, (name.isEmpty() || "off".equalsIgnoreCase(name)) ? null : name);
         return true;
     }
 
     private boolean nickInUse(final User target, final String nick) {
-        String lowerNick = FormatUtil.stripFormat(nick.toLowerCase(Locale.ENGLISH));
-        Iterator var4 = this.essentials.getOnlineUsers().iterator();
+        final String lowerNick = FormatUtil.stripFormat(nick.toLowerCase(Locale.ENGLISH));
+        for (final User onlinePlayer : this.essentials.getOnlineUsers()) {
+            if (target.getBase().getName().equals(onlinePlayer.getName())) {
+                continue;
+            }
 
-        User onlinePlayer;
-        String matchNick;
-        do {
-            do {
-                if (!var4.hasNext()) {
-                    User fetchedUser = this.essentials.getUser(lowerNick);
-                    return fetchedUser != null && fetchedUser != target;
-                }
-
-                onlinePlayer = (User) var4.next();
-            } while (target.getBase().getName().equals(onlinePlayer.getName()));
-
-            matchNick = FormatUtil.stripFormat(onlinePlayer.getNickname());
-        } while ((matchNick == null || matchNick.isEmpty() || !lowerNick.equals(matchNick.toLowerCase(Locale.ENGLISH))) && !lowerNick.equals(onlinePlayer.getName().toLowerCase(Locale.ENGLISH)));
-
-        return true;
+            final String matchNick = FormatUtil.stripFormat(onlinePlayer.getNickname());
+            if ((matchNick != null && !matchNick.isEmpty() && lowerNick.equals(matchNick.toLowerCase(Locale.ENGLISH))) || lowerNick.equals(onlinePlayer.getName().toLowerCase(Locale.ENGLISH))) {
+                return true;
+            }
+        }
+        final User fetchedUser = this.essentials.getUser(lowerNick);
+        return fetchedUser != null && fetchedUser != target;
     }
 
-    private void setNickname(User player, String name) {
+    private void setNickName(User player, String name) {
         player.setNickname(name);
         player.setDisplayNick();
     }

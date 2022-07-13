@@ -45,6 +45,7 @@ public class TicketPlayerCommand extends SubCommand {
         sender.sendMessage(StringCommon.color("Всего штрафов: &6" + tickets.size()));
         sender.sendMessage(StringCommon.color("Варнов: &6" + this.dataCommon.getPlayerWarnings(playerName)));
 
+        // TODO: Может использовать com.google.common.collect.Lists#partition?
         int lastComp = Math.min(page * 5, tickets.size());
         for (int i = (page - 1) * 5; i < lastComp; i++) {
             Ticket ticket = tickets.get(i);
