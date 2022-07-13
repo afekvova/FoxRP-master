@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 public class ItemCommon {
 
+    //TODO: Переписать под новую версию
     public static ItemStack getItem(String id, String name, int amount, List<String> lore) {
         ItemStack itemStack;
         String[] idSplit = id.split(":");

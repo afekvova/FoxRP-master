@@ -40,24 +40,27 @@ public final class FoxRPPlugin extends JavaPlugin {
             return;
         }
 
-        Settings.IMP.reload(new File(this.getDataFolder(), "config.yml"));
+        Settings.IMP.reload(new File(this.getDataFolder(), "config.yml")); // Загружаем конфиг
 
         Essentials essentials = (Essentials) Essentials.getProvidingPlugin(Essentials.class);
-        this.essentialsService = new EssentialsService(essentials);
-        this.skinsRestorerService = new SkinsRestorerService();
+        this.essentialsService = new EssentialsService(essentials); // Содержит методы из Essentials
+        this.skinsRestorerService = new SkinsRestorerService(); // Содержит методы из SkinsRestorer
 
-        this.dataCommon = new DataCommon();
-        this.playerDataService = new PlayerDataService(this, this.dataCommon);
+        this.dataCommon = new DataCommon(); // Репозиторий данных
+        this.playerDataService = new PlayerDataService(this, this.dataCommon); //
 
         //TODO: Добавить поддержку типов базы данных
         this.foxStorage = new SQLiteFoxStorage(this, this.dataCommon);
+        // Если мы не подключились к базе то отключаем плагин
         if (!this.foxStorage.connect()) {
             System.out.printf("Can't connect to database [%s]", StorageType.SQLITE.name());
+            getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
+        // Проверка тикетов
         Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.foxStorage), 20L, 20L);
-
+        
         Arrays.asList(new InventoryListener(), new PlayerListener(this.dataCommon)).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this)); // register listeners
         this.registerCommands();
     }
