@@ -1,5 +1,6 @@
 package me.afek.foxrp.commands.subcommands;
 
+import com.google.common.collect.Lists;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commands.SubCommand;
@@ -33,14 +34,13 @@ public class TicketPlayerCommand extends SubCommand {
             return;
         }
 
-        int page = 1;
+        int page = 0;
         if (args.length >= 2 && StringCommon.isStringInt(args[1]))
-            page = Integer.parseInt(args[1]);
+            page = (Integer.parseInt(args[1]) - 1);
 
-        List<Ticket> tickets = this.getTicketsByPlayer(playerName);
+        List<List<Ticket>> tickets = Lists.partition(this.getTicketsByPlayer(playerName), 5);
 
-        int pageCount = (int) Math.ceil(tickets.size() / (double) 5);
-        if (page < 1 || page > pageCount) {
+        if (page < 0 || page > tickets.size() - 1) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_PLAYER_COMMAND.USE));
             return;
         }
@@ -49,13 +49,10 @@ public class TicketPlayerCommand extends SubCommand {
         sender.sendMessage(StringCommon.color("Всего штрафов: &6" + tickets.size()));
         sender.sendMessage(StringCommon.color("Варнов: &6" + this.warningRepository.getData(playerName)));
 
-        // TODO: Может использовать com.google.common.collect.Lists#partition?
-        int lastComp = Math.min(page * 5, tickets.size());
-        for (int i = (page - 1) * 5; i < lastComp; i++) {
-            Ticket ticket = tickets.get(i);
-            if (ticket != null)
-                sender.sendMessage((i + 1) + ") " + ticket.getIdTicket() + ": " + ticket.getReason());
-        }
+
+        int index = 5 * page;
+        for (Ticket ticket : tickets.get(page))
+            sender.sendMessage((++index) + ") " + ticket.getIdTicket() + ": " + ticket.getReason());
     }
 
     private boolean containTicketByPlayer(String playerName) {
