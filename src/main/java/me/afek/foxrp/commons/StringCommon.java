@@ -5,9 +5,8 @@ import org.bukkit.ChatColor;
 
 public class StringCommon {
 
-
     public static String color(String string) {
-        return ChatColor.translateAlternateColorCodes('&', string.replace("%prefix%", Settings.IMP.PREFIX));
+        return ChatColor.translateAlternateColorCodes('&', string.replace("%prefix%", Settings.IMP.PREFIX).replace("{PREFIX}", Settings.IMP.PREFIX).replace("{PRFX}", Settings.IMP.PREFIX));
     }
 
     public static boolean isStringInt(String s) {
@@ -39,18 +38,18 @@ public class StringCommon {
         String out = "";
         if (l >= 3600L) {
             int h = (int) (l / 3600.0D);
-            out = String.valueOf(h) + " " + padezh("час", "", "а", "ов", h);
+            out = h + " " + padezh("час", "", "а", "ов", h);
             l -= (h * 3600);
         }
 
         if (l >= 60L) {
             int m = (int) (l / 60.0D);
-            out = String.valueOf(out) + ((out.length() > 0) ? ", " : "") + m + " " + padezh("минут", "у", "ы", "", m);
+            out = out + ((out.length() > 0) ? ", " : "") + m + " " + padezh("минут", "у", "ы", "", m);
             l -= (m * 60);
         }
 
         if (out.length() == 0 || l > 0L)
-            out = String.valueOf(out) + ((out.length() > 0) ? ", " : "") + l + " " + padezh("секунд", "у", "ы", "", (int) l);
+            out = out + ((out.length() > 0) ? ", " : "") + l + " " + padezh("секунд", "у", "ы", "", (int) l);
 
         return out;
     }

@@ -58,7 +58,7 @@ public class Settings extends Config {
     public TICKET_PLAYER_COMMAND TICKET_PLAYER_COMMAND;
 
     public static class TICKET_GIVE_COMMAND {
-        public String USE = "%prefix%/bampgive [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
+        public String USE = "%prefix%/ticket give [ник] [алмазы] [срок] [причина] - выдать штраф игроку";
         @Comment("Максимальное количество времени, которое можно установить для штрафа")
         public int MAX_TIME_TICKET = 5;
         @Comment("Минимальное количество времени, которое можно установить для штрафа")
@@ -75,13 +75,13 @@ public class Settings extends Config {
     }
 
     public static class TICKET_REMOVE_COMMAND {
-        public String USE = "%prefix%/bampremove [id штрафа] - удалить штраф";
+        public String USE = "%prefix%/ticket remove [id штрафа] - удалить штраф";
         public String NOT_EXIST = "%prefix%Такой штраф не существует!";
         public String SUCCESS = "%prefix%Вы успешно удалили штраф (&7%ticketId%&f) игроку &6%player%";
     }
 
     public static class TICKET_INFO_COMMAND {
-        public String USE = "%prefix%/bampinfo [id штрафа] - информация о штрафе";
+        public String USE = "%prefix%/ticket info [id штрафа] - информация о штрафе";
         public String NOT_EXIST = "%prefix%Такой штраф не существует!";
         public List<String> MESSAGE = Arrays.asList("&a__________ %ticketId% __________",
                 "&aИгрок: &6%player%",
@@ -91,7 +91,7 @@ public class Settings extends Config {
     }
 
     public static class TICKET_PLAYER_COMMAND {
-        public String USE = "%prefix%/bampplayer [Игрок] - узнать информацию о игроке";
+        public String USE = "%prefix%/ticket player [Игрок] - узнать информацию о игроке";
         public String NOT_EXIST = "%prefix%У игрока нету штрафов!";
     }
 
@@ -99,7 +99,7 @@ public class Settings extends Config {
     public TICKET_EDIT_COMMAND TICKET_EDIT_COMMAND;
 
     public static class TICKET_EDIT_COMMAND {
-        public String USE = "%prefix%/bampedit [id штрафа] [ник] [алмазы] [срок] [причина] - редактировать штраф";
+        public String USE = "%prefix%/ticket edit [id штрафа] [ник] [алмазы] [срок] [причина] - редактировать штраф";
         public String NOT_EXIST = "%prefix%Такой штраф не существует!";
         public String SUCCESS = "%prefix%Вы успешно изменили штраф (&7%ticketId%&f) игроку &6%player%";
     }

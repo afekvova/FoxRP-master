@@ -3,8 +3,8 @@ package me.afek.foxrp;
 import com.earth2me.essentials.Essentials;
 import lombok.Getter;
 import me.afek.foxrp.api.menu.InventoryListener;
-import me.afek.foxrp.commands.ticket.*;
-import me.afek.foxrp.commands.СharacterCommand;
+import me.afek.foxrp.commands.TicketCommand;
+import me.afek.foxrp.commands.subcommands.*;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
@@ -70,7 +70,7 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.getCommand("bampinfo").setExecutor(new TicketInfoCommand(this.dataCommon));
         this.getCommand("bampgive").setExecutor(new TicketGiveCommand(this.sql, this.dataCommon));
         this.getCommand("bampremove").setExecutor(new TicketRemoveCommand(this.sql, this.dataCommon));
-        this.getCommand("character").setExecutor(new СharacterCommand());
+        this.getCommand("character").setExecutor(new TicketCommand());
     }
 
     @Override
