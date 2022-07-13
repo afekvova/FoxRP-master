@@ -33,6 +33,7 @@ public class SQLiteFoxStorage implements FoxStorage {
     @NonFinal
     boolean connecting = false;
 
+    //TODO: Перевести всё на библиотеку ormlite
     public SQLiteFoxStorage(FoxRPPlugin plugin, TicketRepository ticketRepository, WarningRepository warningRepository) {
         this.plugin = plugin;
         this.ticketRepository = ticketRepository;

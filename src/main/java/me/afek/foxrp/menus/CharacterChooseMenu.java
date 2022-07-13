@@ -45,10 +45,10 @@ public class CharacterChooseMenu implements IMenu {
 
     private void loadItems() {
         this.clearItems();
-        this.inventory.setItem(3, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.LORE));
-        this.inventory.setItem(4, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.LORE));
-        this.inventory.setItem(5, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.LORE));
-        this.inventory.setItem(49, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PAGE_ICON.DISPLAYNAME.replace("%number%", String.valueOf(this.page)), 1, Settings.IMP.MENU_SETTINGS.PAGE_ICON.LORE));
+        this.inventory.setItem(3, ItemCommon.itemStack(Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.CREATE_CHARACTER_ICON.LORE));
+        this.inventory.setItem(4, ItemCommon.itemStack(Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.CLEAR_CHARACTER_ICON.LORE));
+        this.inventory.setItem(5, ItemCommon.itemStack(Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.DELETE_CHARACTER_ICON.LORE));
+        this.inventory.setItem(49, ItemCommon.itemStack(Settings.IMP.MENU_SETTINGS.PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PAGE_ICON.DISPLAYNAME.replace("%number%", String.valueOf(this.page)), 1, Settings.IMP.MENU_SETTINGS.PAGE_ICON.LORE));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (slot == 3) {
-            this.plugin.getDataCommon().addNewCharacter(player.getName(), new Character(null, null, null));
+            this.plugin.getCharacterRepository().addData(player.getName(), new Character(null, null, null));
             player.closeInventory();
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.START_CRATE));
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE));
@@ -92,7 +92,7 @@ public class CharacterChooseMenu implements IMenu {
             return;
         }
 
-        if (itemStack.getType() == Material.SKULL_ITEM) {
+        if (itemStack.getType() == Material.PLAYER_HEAD) {
             if (CooldownCommon.hasCooldown(player.getName(), "choosecharacter") && !this.delete) {
                 player.closeInventory();
                 player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.COOLDOWN_MESSAGE.replace("%time%", StringCommon.formatCountdownTime(CooldownCommon.getCooldown(player.getName(), "choosecharacter")))));
@@ -100,7 +100,7 @@ public class CharacterChooseMenu implements IMenu {
             }
 
             int index = slot - 9 + (36 * (this.page - 1));
-            List<Character> playerData = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
+            List<Character> playerData = this.plugin.getCharacterRepository().getPlayerCharacters(player.getName());
 
             if (this.delete) {
                 playerData.remove(index);
@@ -129,7 +129,7 @@ public class CharacterChooseMenu implements IMenu {
 
     public void updateInventory(Player player) {
         loadItems();
-        List<Character> dataList = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
+        List<Character> dataList = this.plugin.getCharacterRepository().getPlayerCharacters(player.getName());
         if (dataList == null)
             dataList = new ArrayList<>();
 
@@ -144,14 +144,14 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (size > endIndex)
-            this.inventory.setItem(53, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.LORE));
+            this.inventory.setItem(53, ItemCommon.itemStack(Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.NEXT_PAGE_ICON.LORE));
 
         if (page > 1)
-            this.inventory.setItem(45, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.LORE));
+            this.inventory.setItem(45, ItemCommon.itemStack(Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.LORE));
     }
 
     private ItemStack getHead(Character characterData) {
-        ItemStack itemStack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD, 1);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
         skullMeta.setDisplayName(StringCommon.color(Settings.IMP.MENU_SETTINGS.CHARACTER_ICON.DISPLAYNAME.replace("%name%", characterData.getName())));
         skullMeta.setLore(Settings.IMP.MENU_SETTINGS.CHARACTER_ICON.LORE.stream().map(string -> StringCommon.color(string.replace("%name%", characterData.getName()))).collect(Collectors.toList()));

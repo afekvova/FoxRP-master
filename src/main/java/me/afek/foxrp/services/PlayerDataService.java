@@ -12,7 +12,6 @@ import me.afek.foxrp.repositories.impl.CharacterRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -26,13 +25,11 @@ public class PlayerDataService {
 
     CharacterRepository characterRepository;
     Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-    Type type = new TypeToken<Map<String, List<String>>>() {
-    }.getType();
 
     @NonFinal
     File cdFile;
 
-    //TODO: Переписать этот калл
+    // TODO: Переписать этот калл, сделать через ormlite
     public PlayerDataService(FoxRPPlugin plugin, CharacterRepository characterRepository) {
         this.characterRepository = characterRepository;
         this.createJsonFile(plugin);
@@ -40,10 +37,10 @@ public class PlayerDataService {
         if (cdFile.length() == 0)
             return;
 
-
         Map<String, List<String>> tempMap;
         try {
-            tempMap = gson.fromJson(new String(Files.readAllBytes(cdFile.toPath())), type);
+            tempMap = gson.fromJson(new String(Files.readAllBytes(cdFile.toPath())), new TypeToken<Map<String, List<String>>>() {
+            }.getType());
         } catch (IOException e) {
             e.printStackTrace();
             return;

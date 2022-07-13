@@ -10,8 +10,6 @@ import net.skinsrestorer.api.property.IProperty;
 import net.skinsrestorer.bukkit.SkinsRestorer;
 import org.bukkit.entity.Player;
 
-import java.util.Optional;
-
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SkinsRestorerService {
 
@@ -38,19 +36,7 @@ public class SkinsRestorerService {
     public void removeSkin(Player player) {
         skinsRestorerAPI.removeSkin(player.getName());
     }
-
-    public boolean setSkin(Player player, String name) {
-        try {
-            Optional<IProperty> defaultSkin = SkinsRestorer.getInstance().getMojangAPI().getSkin(name);
-            this.setSkin(player, defaultSkin.get());
-        } catch (SkinRequestException exception) {
-            exception.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
+    
     public boolean setSkin(Player player, IProperty property) {
         String skinentry = " " + player.getName();
         if (skinentry.length() > 16)

@@ -18,12 +18,12 @@ public class CharacterRepository implements BaseRepository<String, Character> {
     ConcurrentHashMap<String, Character> enterNewCharacter = new ConcurrentHashMap<>();
 
     public void addPlayerCharacter(String name, Character CharacterData) {
-        List<Character> playerCharacteres = this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
-        if (playerCharacteres == null)
-            playerCharacteres = new ArrayList<>();
+        List<Character> playerCharacters = this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
+        if (playerCharacters == null)
+            playerCharacters = new ArrayList<>();
 
-        playerCharacteres.add(CharacterData);
-        this.characterPlayerData.put(name.toLowerCase(), playerCharacteres);
+        playerCharacters.add(CharacterData);
+        this.characterPlayerData.put(name.toLowerCase(), playerCharacters);
     }
 
     public void addPlayerCharacters(String name, List<Character> CharacterData) {
@@ -32,10 +32,6 @@ public class CharacterRepository implements BaseRepository<String, Character> {
 
     public List<Character> getPlayerCharacters(String name) {
         return this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
-    }
-
-    public boolean containPlayer(String name) {
-        return this.characterPlayerData.containsKey(name.toLowerCase());
     }
 
     @Override
@@ -73,6 +69,4 @@ public class CharacterRepository implements BaseRepository<String, Character> {
     public List<Character> getData() {
         return new ArrayList<>(this.enterNewCharacter.values());
     }
-
-
 }

@@ -56,7 +56,8 @@ public class TicketCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length < (subCommand.getMinArgs() - 1) && !(subCommand.getLabel().equalsIgnoreCase("give") || subCommand.getLabel().equalsIgnoreCase("edit"))) {
+        if (args.length < (subCommand.getMinArgs() - 1) &&
+                !(subCommand.getLabel().equalsIgnoreCase("give") || subCommand.getLabel().equalsIgnoreCase("edit"))) {
             sender.sendMessage(subCommand.getUsage());
             return true;
         }

@@ -11,6 +11,7 @@ import java.util.HashMap;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CooldownCommon {
+    
     String player, key;
     long cooldown;
 

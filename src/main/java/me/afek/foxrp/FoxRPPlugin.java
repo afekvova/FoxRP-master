@@ -25,8 +25,9 @@ import java.util.Arrays;
 
 public final class FoxRPPlugin extends JavaPlugin {
 
-    @Getter
     TicketRepository ticketRepository;
+
+    @Getter
     CharacterRepository characterRepository;
     WarningRepository warningRepository;
     PlayerDataService playerDataService;
@@ -50,13 +51,14 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.essentialsService = new EssentialsService(essentials); // Содержит методы из Essentials
         this.skinsRestorerService = new SkinsRestorerService(); // Содержит методы из SkinsRestorer
 
-        this.ticketRepository = new TicketRepository(); // Репозиторий данных
-        this.characterRepository = new CharacterRepository();
-        this.warningRepository = new WarningRepository();
-        this.playerDataService = new PlayerDataService(this, this.characterRepository); //
+        this.ticketRepository = new TicketRepository(); // Репозиторий данных о тикетах
+        this.characterRepository = new CharacterRepository();  // Репозиторий данных о персонажаъ
+        this.warningRepository = new WarningRepository();  // Репозиторий данных о пред-оы
+        this.playerDataService = new PlayerDataService(this, this.characterRepository);
 
         //TODO: Добавить поддержку типов базы данных
         this.foxStorage = new SQLiteFoxStorage(this, this.ticketRepository, this.warningRepository);
+
         // Если мы не подключились к базе то отключаем плагин
         if (!this.foxStorage.connect()) {
             System.out.printf("Can't connect to database [%s]", StorageType.SQLITE.name());
@@ -65,14 +67,19 @@ public final class FoxRPPlugin extends JavaPlugin {
         }
 
         // Проверка тикетов
-        Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.foxStorage), 20L, 20L);
+        Bukkit.getScheduler().runTaskTimer(this,
+                new PlayerTicketsTask(this.ticketRepository, this.warningRepository, this.foxStorage),
+                20L, 20L);
 
-        Arrays.asList(new InventoryListener(), new PlayerListener(this.dataCommon)).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this)); // register listeners
+        // register listeners
+        Arrays.asList(new InventoryListener(), new PlayerListener(this.ticketRepository, this.characterRepository))
+                .forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
         this.registerCommands();
     }
 
     private void registerCommands() {
-        this.getCommand("ticket").setExecutor(new TicketCommand(this.foxStorage, this.dataCommon));
+        this.getCommand("ticket").setExecutor(new TicketCommand(this.foxStorage,
+                this.ticketRepository, this.warningRepository));
         this.getCommand("character").setExecutor(new СharacterCommand(this));
     }
 
@@ -81,8 +88,14 @@ public final class FoxRPPlugin extends JavaPlugin {
         if (this.playerDataService != null)
             this.playerDataService.savePlayerData();
 
-        if (this.dataCommon != null)
-            this.dataCommon.clearAll();
+        if (this.ticketRepository != null)
+            this.ticketRepository.close();
+
+        if (this.warningRepository != null)
+            this.warningRepository.close();
+
+        if (this.characterRepository != null)
+            this.characterRepository.close();
 
         if (this.foxStorage != null)
             this.foxStorage.disconnect();

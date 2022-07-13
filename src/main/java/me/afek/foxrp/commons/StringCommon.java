@@ -46,13 +46,13 @@ public class StringCommon {
         if (l >= 3600L) {
             int h = (int) (l / 3600.0D);
             out = h + " " + padezh("час", "", "а", "ов", h);
-            l -= (h * 3600);
+            l -= (h * 3600L);
         }
 
         if (l >= 60L) {
             int m = (int) (l / 60.0D);
             out = out + ((out.length() > 0) ? ", " : "") + m + " " + padezh("минут", "у", "ы", "", m);
-            l -= (m * 60);
+            l -= (m * 60L);
         }
 
         if (out.length() == 0 || l > 0L)

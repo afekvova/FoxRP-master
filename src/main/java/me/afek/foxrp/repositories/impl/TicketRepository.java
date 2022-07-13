@@ -13,7 +13,7 @@ public class TicketRepository implements BaseRepository<String, Ticket> {
 
     @Override
     public void initial() {
-        // Unsupported operation
+        throw new UnsupportedOperationException();
     }
 
     @Override
