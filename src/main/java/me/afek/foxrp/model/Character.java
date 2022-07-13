@@ -1,4 +1,4 @@
-package me.afek.foxrp.objects;
+package me.afek.foxrp.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,12 +8,9 @@ import lombok.experimental.FieldDefaults;
 
 @Setter
 @Getter
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+public class Character {
 
-public class TicketData {
-
-    String idTicket, name, reason;
-    int diamonds;
-    long finalTime;
+    String name, value, signature;
 }

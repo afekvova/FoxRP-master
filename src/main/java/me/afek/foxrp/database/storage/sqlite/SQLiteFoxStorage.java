@@ -1,4 +1,4 @@
-package me.afek.foxrp.database;
+package me.afek.foxrp.database.storage.sqlite;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.AccessLevel;
@@ -7,7 +7,8 @@ import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.database.FoxStorage;
+import me.afek.foxrp.model.Ticket;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -17,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class Sql {
+public class SQLiteFoxStorage implements FoxStorage {
 
     FoxRPPlugin plugin;
     DataCommon dataCommon;
@@ -29,19 +30,20 @@ public class Sql {
     @NonFinal
     boolean connecting = false;
 
-    public Sql(FoxRPPlugin plugin, DataCommon dataCommon) {
+    public SQLiteFoxStorage(FoxRPPlugin plugin, DataCommon dataCommon) {
         this.plugin = plugin;
         this.dataCommon = dataCommon;
-        setupConnect();
+        this.connect();
     }
 
-    private void setupConnect() {
+    @Override
+    public boolean connect() {
 
         try {
             connecting = true;
 
             if (executor.isShutdown() || (connection != null && connection.isValid(3)))
-                return;
+                return false;
 
             logger.info("[FoxRP] Connect to database...");
             long start = System.currentTimeMillis();
@@ -56,12 +58,15 @@ public class Sql {
             createTable();
             loadTickets();
             loadWarnings();
+            return true;
         } catch (SQLException | ClassNotFoundException e) {
             logger.log(Level.WARNING, "Can not connect to database or execute sql: ", e);
             connection = null;
         } finally {
             connecting = false;
         }
+
+        return false;
     }
 
     private void connectToDatabase(String url, String user, String password) throws SQLException {
@@ -104,7 +109,7 @@ public class Sql {
                     continue;
                 }
 
-                this.dataCommon.addTicket(new TicketData(ticket, player, reason, diamonds, finalTime));
+                this.dataCommon.addTicket(new Ticket(ticket, player, reason, diamonds, finalTime));
                 i++;
             }
 
@@ -133,33 +138,8 @@ public class Sql {
         }
     }
 
-    private boolean isInvalidName(String name) {
-        return name.contains("'") || name.contains("\"");
-    }
-
-    public void removeWarning(String playerName) {
-        String sql = "DELETE FROM `Warnings` WHERE `PlayerName` = '" + playerName.toLowerCase() + "';";
-        this.execute(sql);
-    }
-
-    public void removeTicket(String ticketId) {
-        String sql = "DELETE FROM `Tickets` WHERE `Ticket` = '" + ticketId + "';";
-        this.execute(sql);
-    }
-
-    private void execute(String sql) {
-        if (connection != null) {
-            this.executor.execute(() ->
-            {
-                try (PreparedStatement statament = connection.prepareStatement(sql)) {
-                    statament.execute();
-                } catch (SQLException ignored) {
-                }
-            });
-        }
-    }
-
-    public void saveTicket(TicketData ticketData) {
+    @Override
+    public void saveTicket(Ticket ticketData) {
         if (connecting)
             return;
 
@@ -181,19 +161,19 @@ public class Sql {
                 } catch (SQLException ex) {
                     logger.log(Level.WARNING, "[FoxRP] Can't query database", ex);
                     logger.log(Level.WARNING, sql);
-                    executor.execute(this::setupConnect);
+                    executor.execute(this::connect);
                 }
             });
         }
     }
 
+    @Override
     public void saveWarning(String playerName, int warnings) {
         if (connecting || isInvalidName(playerName))
             return;
 
         if (connection != null) {
             this.executor.execute(() -> {
-                final long timestamp = System.currentTimeMillis();
                 String sql = "SELECT `PlayerName` FROM `Warnings` where `PlayerName` = '" + playerName.toLowerCase() + "' LIMIT 1;";
                 try (Statement statament = connection.createStatement();
                      ResultSet set = statament.executeQuery(sql)) {
@@ -207,13 +187,42 @@ public class Sql {
                 } catch (SQLException ex) {
                     logger.log(Level.WARNING, "[FoxRP] Can't query database", ex);
                     logger.log(Level.WARNING, sql);
-                    executor.execute(this::setupConnect);
+                    executor.execute(this::connect);
                 }
             });
         }
     }
 
-    public void close() {
+    private boolean isInvalidName(String name) {
+        return name.contains("'") || name.contains("\"");
+    }
+
+    @Override
+    public void removeWarning(String playerName) {
+        String sql = "DELETE FROM `Warnings` WHERE `PlayerName` = '" + playerName.toLowerCase() + "';";
+        this.execute(sql);
+    }
+
+    @Override
+    public void removeTicket(String ticketId) {
+        String sql = "DELETE FROM `Tickets` WHERE `Ticket` = '" + ticketId + "';";
+        this.execute(sql);
+    }
+
+    private void execute(String sql) {
+        if (connection != null) {
+            this.executor.execute(() ->
+            {
+                try (PreparedStatement statament = connection.prepareStatement(sql)) {
+                    statament.execute();
+                } catch (SQLException ignored) {
+                }
+            });
+        }
+    }
+
+    @Override
+    public void disconnect() {
         this.executor.shutdownNow();
         try {
             if (connection != null)
@@ -221,5 +230,10 @@ public class Sql {
         } catch (SQLException ignore) {
         }
         this.connection = null;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return this.connecting;
     }
 }

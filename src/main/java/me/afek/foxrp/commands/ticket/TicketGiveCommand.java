@@ -7,8 +7,8 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.database.Sql;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.database.storage.sqlite.SQLiteFoxStorage;
+import me.afek.foxrp.model.Ticket;
 import me.afek.foxrp.utils.RandomString;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketGiveCommand implements CommandExecutor {
 
-    Sql sql;
+    SQLiteFoxStorage sql;
     DataCommon dataCommon;
     RandomString randomString = new RandomString(Settings.IMP.TICKET_GIVE_COMMAND.TICKET_ID_LENGTH);
 
@@ -50,7 +50,7 @@ public class TicketGiveCommand implements CommandExecutor {
         long hoursStamp = System.currentTimeMillis() + hours * (1000L * 3600L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 3, args.length)));
 
-        TicketData ticketData = new TicketData("#" + this.randomString.nextString(), playerName, reason, diamonds, hoursStamp);
+        Ticket ticketData = new Ticket("#" + this.randomString.nextString(), playerName, reason, diamonds, hoursStamp);
         this.dataCommon.addTicket(ticketData);
         this.sql.saveTicket(ticketData);
 

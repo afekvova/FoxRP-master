@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.model.Ticket;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -41,7 +41,7 @@ public class TicketPlayerCommand implements CommandExecutor {
         if (args.length >= 2 && StringCommon.isStringInt(args[1]))
             page = Integer.parseInt(args[1]);
 
-        List<TicketData> tickets = this.dataCommon.getTicketsByPlayer(playerName);
+        List<Ticket> tickets = this.dataCommon.getTicketsByPlayer(playerName);
 
         int pageCount = (int) Math.ceil(tickets.size() / (double) 5);
         if (page < 1 || page > pageCount) {
@@ -55,7 +55,7 @@ public class TicketPlayerCommand implements CommandExecutor {
 
         final int lastComp = Math.min(page * 5, tickets.size());
         for (int i = (page - 1) * 5; i < lastComp; i++) {
-            TicketData ticketData = tickets.get(i);
+            Ticket ticketData = tickets.get(i);
             if (ticketData == null) continue;
 
             sender.sendMessage((i + 1) + ") " + ticketData.getIdTicket() + ": " + ticketData.getReason());

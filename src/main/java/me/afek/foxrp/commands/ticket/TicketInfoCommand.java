@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.model.Ticket;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,7 +35,7 @@ public class TicketInfoCommand implements CommandExecutor {
             return true;
         }
 
-        TicketData ticketData = this.dataCommon.getTicket(ticketId);
+        Ticket ticketData = this.dataCommon.getTicket(ticketId);
         Settings.IMP.TICKET_INFO_COMMAND.MESSAGE.forEach(message -> sender.sendMessage(StringCommon.color(message.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName()).replace("%diamonds%", String.valueOf(ticketData.getDiamonds())).replace("%leftTime%", StringCommon.formatCountdownTime((ticketData.getFinalTime() - System.currentTimeMillis()) / 1000L)).replace("%reason%", ticketData.getReason()))));
         return true;
     }

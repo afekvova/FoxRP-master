@@ -7,8 +7,8 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.database.Sql;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.database.storage.sqlite.SQLiteFoxStorage;
+import me.afek.foxrp.model.Ticket;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketEditCommand implements CommandExecutor {
 
-    Sql sql;
+    SQLiteFoxStorage sql;
     DataCommon dataCommon;
 
     @Override
@@ -52,7 +52,7 @@ public class TicketEditCommand implements CommandExecutor {
         long hoursStamp = System.currentTimeMillis() + hours * (1000L * 3600L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 4, args.length)));
 
-        TicketData ticketData = new TicketData(ticketId, playerName, reason, diamonds, hoursStamp);
+        Ticket ticketData = new Ticket(ticketId, playerName, reason, diamonds, hoursStamp);
         this.dataCommon.addTicket(ticketData);
         this.sql.saveTicket(ticketData);
 

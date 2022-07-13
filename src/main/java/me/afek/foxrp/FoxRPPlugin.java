@@ -1,28 +1,25 @@
 package me.afek.foxrp;
 
 import com.earth2me.essentials.Essentials;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.ticket.*;
 import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.database.Sql;
+import me.afek.foxrp.database.FoxStorage;
+import me.afek.foxrp.database.storage.sqlite.SQLiteFoxStorage;
 import me.afek.foxrp.listeners.PlayerListener;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.PlayerDataService;
 import me.afek.foxrp.services.SkinsRestorerService;
 import me.afek.foxrp.utils.PlayerTicketsTask;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Arrays;
 
-@Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public final class FoxRPPlugin extends JavaPlugin {
 
     @Getter
@@ -37,7 +34,7 @@ public final class FoxRPPlugin extends JavaPlugin {
     EssentialsService essentialsService;
     @Getter
     SkinsRestorerService skinsRestorerService;
-    Sql sql;
+    FoxStorage foxStorage;
 
     @Override
     public void onEnable() {
@@ -58,11 +55,12 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.dataCommon = new DataCommon();
         this.playerDataService = new PlayerDataService(this, this.dataCommon);
 
-        this.sql = new Sql(this, this.dataCommon);
+        //TODO: Добавить поддержку типов базы данных
+        this.foxStorage = new SQLiteFoxStorage(this, this.dataCommon);
 
-        Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.sql), 20L, 20L);
+        Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.foxStorage), 20L, 20L);
 
-        this.registerListeners();
+        Arrays.asList(new InventoryListener(), new PlayerListener(this.dataCommon)).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this)); // register listeners
         this.registerCommands();
     }
 
@@ -75,12 +73,6 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.getCommand("character").setExecutor(new СharacterCommand());
     }
 
-    private void registerListeners() {
-        PluginManager pluginManager = Bukkit.getPluginManager();
-        pluginManager.registerEvents(new InventoryListener(), this);
-        pluginManager.registerEvents(new PlayerListener(this.dataCommon), this);
-    }
-
     @Override
     public void onDisable() {
         if (this.playerDataService != null)
@@ -89,7 +81,7 @@ public final class FoxRPPlugin extends JavaPlugin {
         if (this.dataCommon != null)
             this.dataCommon.clearAll();
 
-        if (this.sql != null)
-            this.sql.close();
+        if (this.foxStorage != null)
+            this.foxStorage.disconnect();
     }
 }

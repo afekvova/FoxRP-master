@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.objects.CharacterData;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.model.Character;
+import me.afek.foxrp.model.Ticket;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
 import net.skinsrestorer.api.property.IProperty;
@@ -32,7 +32,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         String playerName = player.getName();
 
-        TicketData ticketData = this.dataCommon.getTicketByPlayer(playerName);
+        Ticket ticketData = this.dataCommon.getTicketByPlayer(playerName);
         if (ticketData == null) return;
 
         //send player message
@@ -42,7 +42,7 @@ public class PlayerListener implements Listener {
     public void playerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String message = event.getMessage();
-        CharacterData CharacterData = this.dataCommon.getNewCharacter(player.getName());
+        Character CharacterData = this.dataCommon.getNewCharacter(player.getName());
         if (CharacterData == null) return;
 
         if (message.equalsIgnoreCase(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE_WORD))) {

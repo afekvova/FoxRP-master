@@ -8,7 +8,7 @@ import me.afek.foxrp.api.menu.IMenu;
 import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.objects.CharacterData;
+import me.afek.foxrp.model.Character;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.SkinsRestorerService;
 import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
@@ -80,7 +80,7 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (slot == 3) {
-            this.plugin.getDataCommon().addNewCharacter(player.getName(), new CharacterData(null, null, null));
+            this.plugin.getDataCommon().addNewCharacter(player.getName(), new Character(null, null, null));
             player.closeInventory();
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.START_CRATE));
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE));
@@ -102,7 +102,7 @@ public class CharacterChooseMenu implements IMenu {
             }
 
             int index = slot - 9 + (36 * (this.page - 1));
-            List<CharacterData> playerData = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
+            List<Character> playerData = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
 
             if (this.deleteMenu) {
                 playerData.remove(index);
@@ -111,7 +111,7 @@ public class CharacterChooseMenu implements IMenu {
                 return;
             }
 
-            CharacterData characterData = playerData.get(index);
+            Character characterData = playerData.get(index);
             if (characterData == null) return;
 
             if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), characterData.getValue(), characterData.getSignature()))) {
@@ -130,7 +130,7 @@ public class CharacterChooseMenu implements IMenu {
 
     public void updateInventory(Player player) {
         loadItems();
-        List<CharacterData> dataList = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
+        List<Character> dataList = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
         if (dataList == null)
             dataList = new ArrayList<>();
 
@@ -139,7 +139,7 @@ public class CharacterChooseMenu implements IMenu {
         int endIndex = Math.min((index + 36), size);
         int slot = 9;
         dataList = dataList.stream().skip(index).limit(endIndex - index).collect(Collectors.toList());
-        for (CharacterData characterData : dataList) {
+        for (Character characterData : dataList) {
             inventory.setItem(slot, this.getHead(characterData));
             ++slot;
         }
@@ -151,7 +151,7 @@ public class CharacterChooseMenu implements IMenu {
             this.inventory.setItem(45, ItemCommon.getItem(Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.MATERIAL, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.DISPLAYNAME, 1, Settings.IMP.MENU_SETTINGS.PREVIOUS_PAGE_ICON.LORE));
     }
 
-    private ItemStack getHead(CharacterData characterData) {
+    private ItemStack getHead(Character characterData) {
         ItemStack itemStack = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
         skullMeta.setDisplayName(StringCommon.color(Settings.IMP.MENU_SETTINGS.CHARACTER_ICON.DISPLAYNAME.replace("%name%", characterData.getName())));

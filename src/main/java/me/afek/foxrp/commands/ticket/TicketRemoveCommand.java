@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.database.Sql;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.database.storage.sqlite.SQLiteFoxStorage;
+import me.afek.foxrp.model.Ticket;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ import org.bukkit.command.CommandSender;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketRemoveCommand implements CommandExecutor {
 
-    Sql sql;
+    SQLiteFoxStorage sql;
     DataCommon dataCommon;
 
     @Override
@@ -37,9 +37,9 @@ public class TicketRemoveCommand implements CommandExecutor {
             return true;
         }
 
-        TicketData ticketData = this.dataCommon.removeTicket(ticketId);
+        Ticket ticketData = this.dataCommon.removeTicket(ticketId);
         this.sql.removeTicket(ticketData.getIdTicket());
-        
+
         sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_REMOVE_COMMAND.SUCCESS.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName())));
         return true;
     }

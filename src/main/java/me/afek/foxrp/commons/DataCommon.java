@@ -3,8 +3,8 @@ package me.afek.foxrp.commons;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import me.afek.foxrp.objects.CharacterData;
-import me.afek.foxrp.objects.TicketData;
+import me.afek.foxrp.model.Character;
+import me.afek.foxrp.model.Ticket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DataCommon {
 
-    ConcurrentHashMap<String, List<CharacterData>> characterPlayerData = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, CharacterData> enterNewCharacter = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, List<Character>> characterPlayerData = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Character> enterNewCharacter = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Long> coolDownData = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, TicketData> ticketDataConcurrentHashMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Ticket> ticketDataConcurrentHashMap = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Integer> warningsConcurrentHashMap = new ConcurrentHashMap<>();
 
     public void addPlayerWarning(String name) {
@@ -38,7 +38,7 @@ public class DataCommon {
         return this.warningsConcurrentHashMap.getOrDefault(name.toLowerCase(), 0);
     }
 
-    public void addTicket(TicketData ticketData) {
+    public void addTicket(Ticket ticketData) {
         this.ticketDataConcurrentHashMap.put(ticketData.getIdTicket(), ticketData);
     }
 
@@ -48,35 +48,35 @@ public class DataCommon {
 
     public boolean containTicketByPlayer(String playerName) {
         playerName = playerName.toLowerCase();
-        for (TicketData ticketData : this.ticketDataConcurrentHashMap.values())
+        for (Ticket ticketData : this.ticketDataConcurrentHashMap.values())
             if (ticketData.getName().equalsIgnoreCase(playerName)) return true;
 
         return false;
     }
 
-    public TicketData getTicket(String ticketId) {
+    public Ticket getTicket(String ticketId) {
         return this.ticketDataConcurrentHashMap.getOrDefault(ticketId, null);
     }
 
-    public TicketData getTicketByPlayer(String playerName) {
+    public Ticket getTicketByPlayer(String playerName) {
         playerName = playerName.toLowerCase();
-        for (TicketData ticketData : this.ticketDataConcurrentHashMap.values())
+        for (Ticket ticketData : this.ticketDataConcurrentHashMap.values())
             if (ticketData.getName().equalsIgnoreCase(playerName)) return ticketData;
 
         return null;
     }
 
-    public List<TicketData> getTicketsByPlayer(String playerName) {
-        List<TicketData> tickets = new ArrayList<>();
+    public List<Ticket> getTicketsByPlayer(String playerName) {
+        List<Ticket> tickets = new ArrayList<>();
 
         playerName = playerName.toLowerCase();
-        for (TicketData ticketData : this.ticketDataConcurrentHashMap.values())
+        for (Ticket ticketData : this.ticketDataConcurrentHashMap.values())
             if (ticketData.getName().equalsIgnoreCase(playerName)) tickets.add(ticketData);
 
         return tickets;
     }
 
-    public TicketData removeTicket(String ticketId) {
+    public Ticket removeTicket(String ticketId) {
         return this.ticketDataConcurrentHashMap.remove(ticketId);
     }
 
@@ -100,11 +100,11 @@ public class DataCommon {
         this.coolDownData.remove(name.toLowerCase());
     }
 
-    public void addNewCharacter(String name, CharacterData data) {
+    public void addNewCharacter(String name, Character data) {
         this.enterNewCharacter.put(name.toLowerCase(), data);
     }
 
-    public CharacterData getNewCharacter(String name) {
+    public Character getNewCharacter(String name) {
         return this.enterNewCharacter.getOrDefault(name.toLowerCase(), null);
     }
 
@@ -112,8 +112,8 @@ public class DataCommon {
         this.enterNewCharacter.remove(name.toLowerCase());
     }
 
-    public void addPlayerCharacter(String name, CharacterData CharacterData) {
-        List<CharacterData> playerCharacteres = this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
+    public void addPlayerCharacter(String name, Character CharacterData) {
+        List<Character> playerCharacteres = this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
         if (playerCharacteres == null)
             playerCharacteres = new ArrayList<>();
 
@@ -121,11 +121,11 @@ public class DataCommon {
         this.characterPlayerData.put(name.toLowerCase(), playerCharacteres);
     }
 
-    public void addPlayerCharacteres(String name, List<CharacterData> CharacterData) {
+    public void addPlayerCharacteres(String name, List<Character> CharacterData) {
         this.characterPlayerData.put(name.toLowerCase(), CharacterData);
     }
 
-    public List<CharacterData> getPlayerCharacteres(String name) {
+    public List<Character> getPlayerCharacteres(String name) {
         return this.characterPlayerData.getOrDefault(name.toLowerCase(), null);
     }
 
