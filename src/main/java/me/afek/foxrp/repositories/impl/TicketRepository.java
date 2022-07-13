@@ -46,51 +46,7 @@ public class TicketRepository implements BaseRepository<String, Ticket> {
         return new ArrayList<>(this.tickets.values());
     }
 
-//
-//    public void addTicket(Ticket ticketData) {
-//        this.ticketDataConcurrentHashMap.put(ticketData.getIdTicket(), ticketData);
-//    }
-//
-//    public boolean containTicket(String ticketId) {
-//        return this.ticketDataConcurrentHashMap.containsKey(ticketId);
-//    }
-//
-//    public boolean containTicketByPlayer(String playerName) {
-//        playerName = playerName.toLowerCase();
-//        for (Ticket ticketData : this.ticketDataConcurrentHashMap.values())
-//            if (ticketData.getName().equalsIgnoreCase(playerName)) return true;
-//
-//        return false;
-//    }
-//
-//    public Ticket getTicket(String ticketId) {
-//        return this.ticketDataConcurrentHashMap.getOrDefault(ticketId, null);
-//    }
-//
-//    public Ticket getTicketByPlayer(String playerName) {
-//        playerName = playerName.toLowerCase();
-//        for (Ticket ticketData : this.ticketDataConcurrentHashMap.values())
-//            if (ticketData.getName().equalsIgnoreCase(playerName)) return ticketData;
-//
-//        return null;
-//    }
-//
-//    public List<Ticket> getTicketsByPlayer(String playerName) {
-//        List<Ticket> tickets = new ArrayList<>();
-//
-//        playerName = playerName.toLowerCase();
-//        for (Ticket ticketData : this.ticketDataConcurrentHashMap.values())
-//            if (ticketData.getName().equalsIgnoreCase(playerName)) tickets.add(ticketData);
-//
-//        return tickets;
-//    }
-//
-//    public Ticket removeTicket(String ticketId) {
-//        return this.ticketDataConcurrentHashMap.remove(ticketId);
-//    }
-//
-//    public void removeAllTicket(List<String> tickets) {
-//        tickets.forEach(this::removeTicket);
-//    }
-
+    public void removeAllTicket(List<String> tickets) {
+        tickets.forEach(this::removeData);
+    }
 }

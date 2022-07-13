@@ -1,6 +1,7 @@
 package me.afek.foxrp.repositories.impl;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.model.Character;
 import me.afek.foxrp.repositories.BaseRepository;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CharacterRepository implements BaseRepository<String, Character> {
 
+    @Getter
     ConcurrentHashMap<String, List<Character>> characterPlayerData = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, Character> enterNewCharacter = new ConcurrentHashMap<>();
 
@@ -71,4 +73,6 @@ public class CharacterRepository implements BaseRepository<String, Character> {
     public List<Character> getData() {
         return new ArrayList<>(this.enterNewCharacter.values());
     }
+
+
 }

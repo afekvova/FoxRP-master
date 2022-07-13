@@ -11,7 +11,7 @@ public class WarningRepository implements BaseRepository<String, Integer> {
 
     @Override
     public void initial() {
-        // Unsupported operation
+        throw new UnsupportedOperationException();
     }
 
     @Override

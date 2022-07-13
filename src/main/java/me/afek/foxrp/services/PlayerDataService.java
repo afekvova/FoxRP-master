@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.model.Character;
+import me.afek.foxrp.repositories.impl.CharacterRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PlayerDataService {
 
-    DataCommon dataCommon;
+    CharacterRepository characterRepository;
     Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     Type type = new TypeToken<Map<String, List<String>>>() {
     }.getType();
@@ -32,8 +33,8 @@ public class PlayerDataService {
     File cdFile;
 
     //TODO: Переписать этот калл
-    public PlayerDataService(FoxRPPlugin plugin, DataCommon dataCommon) {
-        this.dataCommon = dataCommon;
+    public PlayerDataService(FoxRPPlugin plugin, CharacterRepository characterRepository) {
+        this.characterRepository = characterRepository;
         this.createJsonFile(plugin);
 
         if (cdFile.length() == 0)
@@ -54,13 +55,13 @@ public class PlayerDataService {
                 return new Character(split[0], split[1], split[2]);
             }).collect(Collectors.toList());
 
-            this.dataCommon.addPlayerCharacteres(name.toLowerCase(), heroData);
+            this.characterRepository.addPlayerCharacters(name.toLowerCase(), heroData);
         });
     }
 
     public void savePlayerData() {
         Map<String, List<String>> tempMap = new HashMap<>();
-        for (Map.Entry<String, List<Character>> stringListEntry : this.dataCommon.getCharacterPlayerData().entrySet())
+        for (Map.Entry<String, List<Character>> stringListEntry : this.characterRepository.getCharacterPlayerData().entrySet())
             tempMap.put(stringListEntry.getKey(), stringListEntry.getValue().stream().map(hero -> hero.getName() + ":" + hero.getValue() + ":" + hero.getSignature()).collect(Collectors.toList()));
 
         try {

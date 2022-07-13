@@ -10,6 +10,9 @@ import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.database.storage.StorageType;
 import me.afek.foxrp.database.storage.sqlite.SQLiteFoxStorage;
 import me.afek.foxrp.listeners.PlayerListener;
+import me.afek.foxrp.repositories.impl.CharacterRepository;
+import me.afek.foxrp.repositories.impl.TicketRepository;
+import me.afek.foxrp.repositories.impl.WarningRepository;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.PlayerDataService;
 import me.afek.foxrp.services.SkinsRestorerService;
@@ -23,7 +26,9 @@ import java.util.Arrays;
 public final class FoxRPPlugin extends JavaPlugin {
 
     @Getter
-    DataCommon dataCommon;
+    TicketRepository ticketRepository;
+    CharacterRepository characterRepository;
+    WarningRepository warningRepository;
     PlayerDataService playerDataService;
     @Getter
     EssentialsService essentialsService;
@@ -45,11 +50,13 @@ public final class FoxRPPlugin extends JavaPlugin {
         this.essentialsService = new EssentialsService(essentials); // Содержит методы из Essentials
         this.skinsRestorerService = new SkinsRestorerService(); // Содержит методы из SkinsRestorer
 
-        this.dataCommon = new DataCommon(); // Репозиторий данных
-        this.playerDataService = new PlayerDataService(this, this.dataCommon); //
+        this.ticketRepository = new TicketRepository(); // Репозиторий данных
+        this.characterRepository = new CharacterRepository();
+        this.warningRepository = new WarningRepository();
+        this.playerDataService = new PlayerDataService(this, this.characterRepository); //
 
         //TODO: Добавить поддержку типов базы данных
-        this.foxStorage = new SQLiteFoxStorage(this, this.dataCommon);
+        this.foxStorage = new SQLiteFoxStorage(this, this.ticketRepository, this.warningRepository);
         // Если мы не подключились к базе то отключаем плагин
         if (!this.foxStorage.connect()) {
             System.out.printf("Can't connect to database [%s]", StorageType.SQLITE.name());
