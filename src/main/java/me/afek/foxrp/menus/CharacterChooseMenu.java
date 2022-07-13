@@ -9,10 +9,8 @@ import me.afek.foxrp.commons.ItemCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.model.Character;
-import me.afek.foxrp.services.EssentialsService;
-import me.afek.foxrp.services.SkinsRestorerService;
 import net.skinsrestorer.api.bukkit.BukkitHeadAPI;
-import net.skinsrestorer.api.property.BukkitProperty;
+import net.skinsrestorer.bukkit.utils.BukkitProperty;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,22 +25,21 @@ import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CharacterChooseMenu implements IMenu {
+    FoxRPPlugin plugin;
 
-    FoxRPPlugin plugin = FoxRPPlugin.getInstance();
-    EssentialsService essentialsService = plugin.getEssentialsService();
-    SkinsRestorerService skinsRestorerService = plugin.getSkinsRestorerService();
-    
     @NonFinal
     Inventory inventory;
     @NonFinal
-    boolean deleteMenu;
+    boolean delete;
     @NonFinal
     int page = 1;
 
-    public CharacterChooseMenu(boolean deleteMenu) {
-        this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(deleteMenu ? Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE : Settings.IMP.MENU_SETTINGS.DISPLAYNAME));
+    public CharacterChooseMenu(FoxRPPlugin plugin, boolean delete) {
+        this.plugin = plugin;
+        this.delete = delete;
+
+        this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(delete ? Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE : Settings.IMP.MENU_SETTINGS.DISPLAYNAME));
         this.loadItems();
-        this.deleteMenu = deleteMenu;
     }
 
     private void loadItems() {
@@ -71,7 +68,7 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (slot == 5) {
-            this.deleteMenu = true;
+            this.delete = true;
             this.inventory = Bukkit.createInventory(this, 9 * 6, StringCommon.color(Settings.IMP.MENU_SETTINGS.DISPLAYNAME_DELETE));
 
             player.closeInventory();
@@ -88,14 +85,14 @@ public class CharacterChooseMenu implements IMenu {
         }
 
         if (slot == 4) {
-            this.skinsRestorerService.clearSkin(player);
-            this.essentialsService.setPlayerName(player, null);
+            this.plugin.getSkinsRestorerService().clearSkin(player);
+            this.plugin.getEssentialsService().setPlayerName(player, null);
             player.closeInventory();
             return;
         }
 
         if (itemStack.getType() == Material.SKULL_ITEM) {
-            if (this.plugin.getDataCommon().containCoolDown(player.getName()) && this.plugin.getDataCommon().getCoolDown(player.getName()) > System.currentTimeMillis() && !this.deleteMenu) {
+            if (this.plugin.getDataCommon().containCoolDown(player.getName()) && this.plugin.getDataCommon().getCoolDown(player.getName()) > System.currentTimeMillis() && !this.delete) {
                 player.closeInventory();
                 player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.COOLDOWN_MESSAGE.replace("%time%", StringCommon.formatCountdownTime((this.plugin.getDataCommon().getCoolDown(player.getName()) - System.currentTimeMillis()) / 1000))));
                 return;
@@ -104,7 +101,7 @@ public class CharacterChooseMenu implements IMenu {
             int index = slot - 9 + (36 * (this.page - 1));
             List<Character> playerData = this.plugin.getDataCommon().getPlayerCharacteres(player.getName());
 
-            if (this.deleteMenu) {
+            if (this.delete) {
                 playerData.remove(index);
                 player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.SUCCESS_DELETE_CHARACTER));
                 player.closeInventory();
@@ -114,8 +111,8 @@ public class CharacterChooseMenu implements IMenu {
             Character characterData = playerData.get(index);
             if (characterData == null) return;
 
-            if (this.skinsRestorerService.setSkin(player, new BukkitProperty(player.getName(), characterData.getValue(), characterData.getSignature()))) {
-                this.essentialsService.setPlayerName(player, characterData.getName());
+            if (this.plugin.getSkinsRestorerService().setSkin(player, new BukkitProperty(player.getName(), characterData.getValue(), characterData.getSignature()))) {
+                this.plugin.getEssentialsService().setPlayerName(player, characterData.getName());
                 this.plugin.getDataCommon().addCoolDown(player.getName(), System.currentTimeMillis() + 1000 * 30);
                 player.closeInventory();
                 player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.SUCCESS_ENTER_CHARACTER.replace("%nick%", characterData.getName())));

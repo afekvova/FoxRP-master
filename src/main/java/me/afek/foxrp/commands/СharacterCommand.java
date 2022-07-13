@@ -1,5 +1,7 @@
 package me.afek.foxrp.commands;
 
+import lombok.RequiredArgsConstructor;
+import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.menus.CharacterChooseMenu;
@@ -8,8 +10,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public class СharacterCommand implements CommandExecutor {
-    
+
+    private final FoxRPPlugin foxRPPlugin;
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -23,8 +28,7 @@ public class СharacterCommand implements CommandExecutor {
             return true;
         }
 
-        CharacterChooseMenu mainMenu = new CharacterChooseMenu(false);
-        mainMenu.show(player);
+        new CharacterChooseMenu(this.foxRPPlugin, false).show(player);
         return true;
     }
 }

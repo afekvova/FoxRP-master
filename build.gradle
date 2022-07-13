@@ -35,7 +35,8 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     compileOnly 'net.essentialsx:EssentialsX:2.19.1-SNAPSHOT'
-    compileOnly 'net.skinsrestorer:skinsrestorer-api:14.2.1'
+//    compileOnly 'net.skinsrestorer:skinsrestorer-api:14.2.1'
+    implementation files('libs/SkinsRestorer.jar')
 
     implementation 'com.google.code.gson:gson:2.9.0'
 }

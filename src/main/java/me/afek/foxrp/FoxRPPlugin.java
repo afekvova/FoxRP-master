@@ -24,13 +24,8 @@ import java.util.Arrays;
 public final class FoxRPPlugin extends JavaPlugin {
 
     @Getter
-    static FoxRPPlugin instance;
-
     DataCommon dataCommon;
-    @Getter
     PlayerDataService playerDataService;
-    @Getter
-    Essentials essentials;
     @Getter
     EssentialsService essentialsService;
     @Getter
@@ -39,8 +34,6 @@ public final class FoxRPPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
-
         if (getServer().getPluginManager().getPlugin("Essentials") == null) {
             this.getLogger().severe(String.format("[%s] - Disabled due to no Essentials dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
@@ -49,8 +42,8 @@ public final class FoxRPPlugin extends JavaPlugin {
 
         Settings.IMP.reload(new File(this.getDataFolder(), "config.yml"));
 
-        this.essentials = (Essentials) Essentials.getProvidingPlugin(Essentials.class);
-        this.essentialsService = new EssentialsService(this.essentials);
+        Essentials essentials = (Essentials) Essentials.getProvidingPlugin(Essentials.class);
+        this.essentialsService = new EssentialsService(essentials);
         this.skinsRestorerService = new SkinsRestorerService();
 
         this.dataCommon = new DataCommon();
@@ -71,7 +64,7 @@ public final class FoxRPPlugin extends JavaPlugin {
 
     private void registerCommands() {
         this.getCommand("ticket").setExecutor(new TicketCommand(this.foxStorage, this.dataCommon));
-        this.getCommand("character").setExecutor(new СharacterCommand());
+        this.getCommand("character").setExecutor(new СharacterCommand(this));
     }
 
     @Override
