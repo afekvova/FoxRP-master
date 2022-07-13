@@ -4,11 +4,11 @@ import com.google.common.base.Joiner;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commands.SubCommand;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.model.Ticket;
+import me.afek.foxrp.repositories.impl.TicketRepository;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -17,12 +17,12 @@ import java.util.Arrays;
 public class TicketEditCommand extends SubCommand {
 
     FoxStorage foxStorage;
-    DataCommon dataCommon;
+    TicketRepository repository;
 
-    public TicketEditCommand(FoxStorage foxStorage, DataCommon dataCommon) {
+    public TicketEditCommand(FoxStorage foxStorage, TicketRepository repository) {
         super("edit", 5, Settings.IMP.TICKET_EDIT_COMMAND.USE);
         this.foxStorage = foxStorage;
-        this.dataCommon = dataCommon;
+        this.repository = repository;
     }
 
     @Override
@@ -32,8 +32,8 @@ public class TicketEditCommand extends SubCommand {
             return;
         }
 
-        String ticketId = args[0];
-        if (!this.dataCommon.containTicket(ticketId)) {
+        String id = args[0];
+        if (!this.repository.containData(id)) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.NOT_EXIST));
             return;
         }
@@ -50,10 +50,10 @@ public class TicketEditCommand extends SubCommand {
         long hoursStamp = System.currentTimeMillis() + hours * (1000L * 3600L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 4, args.length)));
 
-        Ticket ticketData = new Ticket(ticketId, playerName, reason, diamonds, hoursStamp);
-        this.dataCommon.addTicket(ticketData);
-        this.foxStorage.saveTicket(ticketData);
+        Ticket ticket = new Ticket(id, playerName, reason, diamonds, hoursStamp);
+        this.repository.addData(id, ticket);
+        this.foxStorage.saveTicket(ticket);
 
-        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.SUCCESS.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName())));
+        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.SUCCESS.replace("%id%", ticket.getIdTicket()).replace("%player%", ticket.getName())));
     }
 }

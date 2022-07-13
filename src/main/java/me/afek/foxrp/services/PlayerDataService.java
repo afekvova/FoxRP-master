@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.model.Character;
 
 import java.io.File;

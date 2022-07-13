@@ -3,7 +3,6 @@ package me.afek.foxrp.commands;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commands.subcommands.*;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;

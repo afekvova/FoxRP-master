@@ -3,7 +3,6 @@ package me.afek.foxrp.tasks;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.model.Ticket;
 

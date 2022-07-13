@@ -4,11 +4,11 @@ import com.google.common.base.Joiner;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commands.SubCommand;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.model.Ticket;
+import me.afek.foxrp.repositories.impl.TicketRepository;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,12 +19,12 @@ import java.util.Arrays;
 public class TicketGiveCommand extends SubCommand {
 
     FoxStorage foxStorage;
-    DataCommon dataCommon;
+    TicketRepository repository;
 
-    public TicketGiveCommand(FoxStorage foxStorage, DataCommon dataCommon) {
+    public TicketGiveCommand(FoxStorage foxStorage, TicketRepository repository) {
         super("give", 4, Settings.IMP.TICKET_GIVE_COMMAND.USE);
         this.foxStorage = foxStorage;
-        this.dataCommon = dataCommon;
+        this.repository = repository;
     }
 
     @Override
@@ -46,15 +46,15 @@ public class TicketGiveCommand extends SubCommand {
         long hoursStamp = System.currentTimeMillis() + hours * (1000L * 3600L);
         String reason = Joiner.on(' ').join(Arrays.asList(Arrays.copyOfRange(args, 3, args.length)));
 
-        Ticket ticketData = new Ticket("#" + this.generateRandomString(21), playerName, reason, diamonds, hoursStamp);
-        this.dataCommon.addTicket(ticketData);
-        this.foxStorage.saveTicket(ticketData);
+        Ticket ticket = new Ticket("#" + this.generateRandomString(21), playerName, reason, diamonds, hoursStamp);
+        this.repository.addData(ticket.getIdTicket(), ticket);
+        this.foxStorage.saveTicket(ticket);
 
-        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.SUCCESS.replace("%ticketId%", ticketData.getIdTicket()).replace("%player%", ticketData.getName())));
+        sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.SUCCESS.replace("%ticketId%", ticket.getIdTicket()).replace("%player%", ticket.getName())));
 
         Player player = Bukkit.getPlayer(playerName);
         if (player == null || !player.isOnline() || !Settings.IMP.TICKET_GIVE_COMMAND.SEND_PLAYER_MESSAGE) return;
-        player.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.PLAYER_MESSAGE.replace("%ticketId%", ticketData.getIdTicket())));
+        player.sendMessage(StringCommon.color(Settings.IMP.TICKET_GIVE_COMMAND.PLAYER_MESSAGE.replace("%ticketId%", ticket.getIdTicket())));
     }
 
     private String generateRandomString(int length) {

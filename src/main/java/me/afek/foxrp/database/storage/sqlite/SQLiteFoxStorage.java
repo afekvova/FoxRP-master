@@ -5,10 +5,11 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.model.Ticket;
+import me.afek.foxrp.repositories.impl.TicketRepository;
+import me.afek.foxrp.repositories.impl.WarningRepository;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -21,7 +22,9 @@ import java.util.logging.Logger;
 public class SQLiteFoxStorage implements FoxStorage {
 
     FoxRPPlugin plugin;
-    DataCommon dataCommon;
+
+    TicketRepository ticketRepository;
+    WarningRepository warningRepository;
     ExecutorService executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("FoxRP-SQL-%d").build());
     Logger logger = Bukkit.getLogger();
 
@@ -30,9 +33,11 @@ public class SQLiteFoxStorage implements FoxStorage {
     @NonFinal
     boolean connecting = false;
 
-    public SQLiteFoxStorage(FoxRPPlugin plugin, DataCommon dataCommon) {
+    public SQLiteFoxStorage(FoxRPPlugin plugin, TicketRepository ticketRepository, WarningRepository warningRepository) {
         this.plugin = plugin;
-        this.dataCommon = dataCommon;
+        this.ticketRepository = ticketRepository;
+        this.warningRepository = warningRepository;
+
         this.connect();
     }
 
@@ -109,7 +114,7 @@ public class SQLiteFoxStorage implements FoxStorage {
                     continue;
                 }
 
-                this.dataCommon.addTicket(new Ticket(ticket, player, reason, diamonds, finalTime));
+                this.ticketRepository.addData(ticket, new Ticket(ticket, player, reason, diamonds, finalTime));
                 i++;
             }
 
@@ -130,7 +135,7 @@ public class SQLiteFoxStorage implements FoxStorage {
                     continue;
                 }
 
-                this.dataCommon.addPlayerWarning(playerName, warnings);
+                this.warningRepository.addData(playerName, warnings);
                 i++;
             }
 

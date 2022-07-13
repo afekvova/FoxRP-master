@@ -5,7 +5,6 @@ import lombok.Getter;
 import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.TicketCommand;
 import me.afek.foxrp.commands.СharacterCommand;
-import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.database.storage.StorageType;
@@ -60,7 +59,7 @@ public final class FoxRPPlugin extends JavaPlugin {
 
         // Проверка тикетов
         Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.foxStorage), 20L, 20L);
-        
+
         Arrays.asList(new InventoryListener(), new PlayerListener(this.dataCommon)).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this)); // register listeners
         this.registerCommands();
     }
