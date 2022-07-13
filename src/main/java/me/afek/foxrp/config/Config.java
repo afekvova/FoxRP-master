@@ -1,354 +1,109 @@
 package me.afek.foxrp.config;
 
-import org.bukkit.configuration.MemorySection;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Bukkit;
+import org.yaml.snakeyaml.Yaml;
+import sun.misc.Unsafe;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Config {
 
-    public Config() {
-        save(new ArrayList<>(), getClass(), this, 0);
-    }
+    private static final Logger LOGGER = Bukkit.getLogger();
 
     /**
-     * Set the value of a specific node<br>
-     * Probably throws some error if you supply non existing keys or invalid
-     * values
+     * Set the value of a specific node. Probably throws some error if you supply non-existing keys or invalid values.
      *
      * @param key   config node
      * @param value value
      */
-    private void set(String key, Object value) {
+    private void set(String key, Object value, Class<?> root) {
         String[] split = key.split("\\.");
-        Object instance = getInstance(split, this.getClass());
+        Object instance = this.getInstance(split, root);
         if (instance != null) {
-            Field field = getField(split, instance);
+            Field field = this.getField(split, instance);
             if (field != null) {
                 try {
-                    if (field.getAnnotation(Final.class) != null)
+                    if (field.getAnnotation(Final.class) != null) {
                         return;
-
-                    if (field.getType() == String.class
-                            && !(value instanceof String))
+                    }
+                    if (field.getType() == String.class && !(value instanceof String)) {
                         value = value + "";
-
+                    }
                     field.set(instance, value);
                     return;
-                } catch (IllegalAccessException | IllegalArgumentException e) {
-
+                } catch (Throwable e) {
+                    e.printStackTrace();
                 }
+            }
+        }
+
+        LOGGER.log(Level.SEVERE, "Failed to set config option: " + key + ": " + value + " | " + instance + " | " + root.getSimpleName() + ".yml");
+    }
+
+    @SuppressWarnings("unchecked")
+    public void set(Map<String, Object> input, String oldPath) {
+        for (Map.Entry<String, Object> entry : input.entrySet()) {
+            String key = oldPath + (oldPath.isEmpty() ? "" : ".") + entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                this.set((Map<String, Object>) value, key);
+            } else if (value instanceof String) {
+                this.set(key, ((String) value).replace("{NL}", "\n").replace("&", "§"), this.getClass());
+            } else {
+                this.set(key, value, this.getClass());
             }
         }
     }
 
     public boolean load(File file) {
-        if (!file.exists())
-            return false;
-
-        YamlConfiguration yml;
-        try {
-            try (InputStreamReader reader = new InputStreamReader(
-                    new FileInputStream(file), StandardCharsets.UTF_8)) {
-                yml = YamlConfiguration.loadConfiguration(reader);
-            }
-        } catch (IOException ex) {
+        if (!file.exists()) {
             return false;
         }
-        set(yml, "");
+
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+            this.set((Map<String, Object>) new Yaml().load(reader), "");
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Unable to load config ", e);
+            return false;
+        }
+
         return true;
     }
 
-    public void set(YamlConfiguration yml, String oldPath) {
-        for (String key : yml.getKeys(true)) {
-            Object value = yml.get(key);
-            String newPath = oldPath + (oldPath.isEmpty() ? "" : ".") + key;
-            if (value instanceof MemorySection)
-                continue;
-
-            set(newPath, value);
-        }
-    }
-
-    /*
-     * public int getConfigVersion(File file) { return
-     * YamlConfiguration.loadConfiguration( file ).getInt( "config-version", 0
-     * ); }
-     */
-
     /**
-     * Set all values in the file (load first to avoid overwriting)
-     *
-     * @param file file
-     */
-    public void save(File file) {
-        try {
-            File parent = file.getParentFile();
-            if (parent != null)
-                file.getParentFile().mkdirs();
-
-            Path configFile = file.toPath();
-            Path tempCfg = new File(file.getParentFile(), "__tmpcfg").toPath();
-            List<String> lines = new ArrayList<>();
-            save(lines, getClass(), this, 0);
-
-            Files.write(tempCfg, lines, StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE);
-            try {
-                Files.move(tempCfg, configFile,
-                        StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tempCfg, configFile,
-                        StandardCopyOption.REPLACE_EXISTING);
-            }
-
-        } catch (IOException e) {
-
-        }
-    }
-
-    private String toYamlString(Object value, String spacing) {
-        if (value instanceof List) {
-            Collection<?> listValue = (Collection<?>) value;
-            if (listValue.isEmpty())
-                return "[]";
-
-            StringBuilder m = new StringBuilder();
-            for (Object obj : listValue)
-                m.append(System.lineSeparator()).append(spacing).append("- ").append(toYamlString(obj, spacing));
-
-            return m.toString();
-        }
-
-        if (value instanceof String) {
-            String stringValue = (String) value;
-            if (stringValue.isEmpty())
-                return "''";
-
-            return "\"" + stringValue + "\"";
-        }
-
-        return value != null ? value.toString() : "null";
-    }
-
-    private void save(List<String> lines, Class clazz, final Object instance,
-                      int indent) {
-        try {
-            String spacing = repeat(" ", indent);
-            for (Field field : clazz.getFields()) {
-                if (field.getAnnotation(Ignore.class) != null)
-                    continue;
-
-                Class<?> current = field.getType();
-                if (field.getAnnotation(Ignore.class) != null)
-                    continue;
-
-                Comment comment = field.getAnnotation(Comment.class);
-                if (comment != null) for (String commentLine : comment.value()) lines.add(spacing + "# " + commentLine);
-
-                Create create = field.getAnnotation(Create.class);
-                if (create != null) {
-                    Object value = field.get(instance);
-                    setAccessible(field);
-                    if (indent == 0)
-                        lines.add("");
-
-                    comment = current.getAnnotation(Comment.class);
-                    if (comment != null)
-                        for (String commentLine : comment.value())
-                            lines.add(spacing + "# " + commentLine);
-
-                    lines.add(spacing + toNodeName(current.getSimpleName())
-                            + ":");
-                    if (value == null)
-                        field.set(instance, value = current.newInstance());
-
-
-                    save(lines, current, value, indent + 2);
-                } else {
-                    lines.add(spacing + toNodeName(field.getName() + ": ")
-                            + toYamlString(field.get(instance), spacing));
-                }
-            }
-        } catch (Exception e) {
-
-        }
-    }
-
-    /**
-     * Get the field for a specific config node and instance<br>
-     * Note: As expiry can have multiple blocks there will be multiple instances
-     *
-     * @param split    the node (split by period)
-     * @param instance the instance
-     * @return Field field
-     */
-    private Field getField(String[] split, Object instance) {
-        try {
-            Field field = instance.getClass()
-                    .getField(toFieldName(split[split.length - 1]));
-            setAccessible(field);
-            return field;
-        } catch (IllegalAccessException | NoSuchFieldException
-                | SecurityException | NoSuchMethodException
-                | InvocationTargetException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Get the instance for a specific config node
-     *
-     * @param split the node (split by period)
-     * @param root  the root class
-     * @return The instance or null
-     */
-    private Object getInstance(String[] split, Class root) {
-        try {
-            Class<?> clazz = root == null
-                    ? MethodHandles.lookup().lookupClass()
-                    : root;
-            Object instance = this;
-            while (split.length > 0) {
-                switch (split.length) {
-                    case 1:
-                        return instance;
-                    default:
-                        Class found = null;
-                        Class<?>[] classes = clazz.getDeclaredClasses();
-                        for (Class current : classes) {
-                            if (current.getSimpleName()
-                                    .equalsIgnoreCase(toFieldName(split[0]))) {
-                                found = current;
-                                break;
-                            }
-                        }
-                        try {
-                            Field instanceField = clazz
-                                    .getDeclaredField(toFieldName(split[0]));
-                            setAccessible(instanceField);
-                            Object value = instanceField.get(instance);
-                            if (value == null) {
-                                value = found.newInstance();
-                                instanceField.set(instance, value);
-                            }
-                            clazz = found;
-                            instance = value;
-                            split = Arrays.copyOfRange(split, 1, split.length);
-                            continue;
-                        } catch (NoSuchFieldException | NoSuchMethodException
-                                | InvocationTargetException ignore) {
-                        }
-                        return null;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Translate a node to a java field name
-     *
-     * @param node node to translate
-     * @return java field name
-     */
-    private String toFieldName(String node) {
-        return node.toUpperCase().replaceAll("-", "_");
-    }
-
-    /**
-     * Translate a field to a config node
-     *
-     * @param field to translate
-     * @return config node name
-     */
-    private String toNodeName(String field) {
-        return field.toLowerCase().replace("_", "-");
-    }
-
-    /**
-     * Set some field to be accesible
-     *
-     * @param field to be accesible
-     * @throws NoSuchFieldException   ...
-     * @throws IllegalAccessException ...
-     */
-    private void setAccessible(Field field)
-            throws NoSuchFieldException, IllegalAccessException,
-            NoSuchMethodException, InvocationTargetException {
-        field.setAccessible(true);
-        int modifiers = field.getModifiers();
-        if (Modifier.isFinal(modifiers)) {
-            try {
-                Field modifiersField = Field.class
-                        .getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(field, modifiers & ~Modifier.FINAL);
-            } catch (NoSuchFieldException e) {
-                // Java 12 compatibility *this is fine*
-                Method getDeclaredFields0 = Class.class
-                        .getDeclaredMethod("getDeclaredFields0", boolean.class);
-                getDeclaredFields0.setAccessible(true);
-                Field[] fields = (Field[]) getDeclaredFields0
-                        .invoke(Field.class, false);
-                for (Field classField : fields) {
-                    if ("modifiers".equals(classField.getName())) {
-                        classField.setAccessible(true);
-                        classField.set(field, modifiers & ~Modifier.FINAL);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    private String repeat(final String s, final int n) {
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            sb.append(s);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Indicates that a field should be instantiated / created
+     * Indicates that a field should be instantiated / created.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface Create {
+
     }
 
     /**
-     * Indicates that a field cannot be modified
+     * Indicates that a field cannot be modified.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface Final {
+
     }
 
     /**
-     * Creates a comment
+     * Creates a comment.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
@@ -358,10 +113,249 @@ public class Config {
     }
 
     /**
-     * Any field or class with is not part of the config
+     * Any field or class with is not part of the config.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface Ignore {
+
+    }
+
+    private String toYamlString(Object value, String spacing, String fieldName) {
+        if (value instanceof List) {
+            Collection<?> listValue = (Collection<?>) value;
+            if (listValue.isEmpty()) {
+                return "[]";
+            }
+            StringBuilder m = new StringBuilder();
+            for (Object obj : listValue) {
+                m.append(System.lineSeparator()).append(spacing).append("- ").append(this.toYamlString(obj, spacing, fieldName));
+            }
+
+            return m.toString();
+        }
+
+        if (value instanceof String) {
+            String stringValue = (String) value;
+            if (stringValue.isEmpty()) {
+                return "\"\"";
+            }
+
+            String quoted = "\"" + stringValue + "\"";
+            if (fieldName.equalsIgnoreCase("prefix")) {
+                return quoted;
+            } else {
+                return quoted.replace("\n", "{NL}");
+            }
+        }
+
+        return value != null ? value.toString() : "null";
+    }
+
+    /**
+     * Set all values in the file (load first to avoid overwriting).
+     */
+    public void save(File file) {
+        try {
+            if (!file.exists()) {
+                File parent = file.getParentFile();
+                if (parent != null) {
+                    file.getParentFile().mkdirs();
+                }
+                file.createNewFile();
+            }
+
+            PrintWriter writer = new PrintWriter(file, StandardCharsets.UTF_8.name());
+            Object instance = this;
+            this.save(writer, this.getClass(), instance, 0);
+            writer.close();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void save(PrintWriter writer, Class<?> clazz, Object instance, int indent) {
+        try {
+            String lineSeparator = System.lineSeparator();
+            String spacing = this.repeat(" ", indent);
+
+            for (Field field : clazz.getFields()) {
+                if (field.getAnnotation(Ignore.class) != null) {
+                    continue;
+                }
+                Class<?> current = field.getType();
+                if (field.getAnnotation(Ignore.class) != null) {
+                    continue;
+                }
+
+                Comment comment = field.getAnnotation(Comment.class);
+                if (comment != null) {
+                    for (String commentLine : comment.value()) {
+                        writer.write(spacing + "# " + commentLine + lineSeparator);
+                    }
+                }
+
+                Create create = field.getAnnotation(Create.class);
+                if (create != null) {
+                    Object value = field.get(instance);
+                    this.setAccessible(field);
+                    if (indent == 0) {
+                        writer.write(lineSeparator);
+                    }
+                    comment = current.getAnnotation(Comment.class);
+                    if (comment != null) {
+                        for (String commentLine : comment.value()) {
+                            writer.write(spacing + "# " + commentLine + lineSeparator);
+                        }
+                    }
+                    writer.write(spacing + this.toNodeName(current.getSimpleName()) + ":" + lineSeparator);
+                    if (value == null) {
+                        field.set(instance, value = current.getDeclaredConstructor().newInstance());
+                    }
+                    this.save(writer, current, value, indent + 2);
+                } else {
+                    String value = this.toYamlString(field.get(instance), spacing, field.getName());
+                    writer.write(spacing + this.toNodeName(field.getName() + ": ") + value + lineSeparator);
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Get the field for a specific config node and instance.
+     *
+     * <p>As expiry can have multiple blocks there will be multiple instances
+     *
+     * @param split    the node (split by period)
+     * @param instance the instance
+     */
+    private Field getField(String[] split, Object instance) {
+        try {
+            Field field = instance.getClass().getField(this.toFieldName(split[split.length - 1]));
+            this.setAccessible(field);
+            return field;
+        } catch (Throwable ignored) {
+            LOGGER.log(Level.SEVERE, "Invalid config field: " + this.join(split, ".") + " for " + this.toNodeName(instance.getClass().getSimpleName()));
+            return null;
+        }
+    }
+
+    /**
+     * Get the instance for a specific config node.
+     *
+     * @param split the node (split by period)
+     * @return The instance or null
+     */
+    private Object getInstance(String[] split, Class<?> root) {
+        try {
+            Class<?> clazz = root == null ? MethodHandles.lookup().lookupClass() : root;
+            Object instance = this;
+            while (split.length > 0) {
+                if (split.length == 1) {
+                    return instance;
+                } else {
+                    Class<?> found = null;
+                    if (clazz == null) {
+                        return null;
+                    }
+
+                    Class<?>[] classes = clazz.getDeclaredClasses();
+                    for (Class<?> current : classes) {
+                        if (Objects.equals(current.getSimpleName(), this.toFieldName(split[0]))) {
+                            found = current;
+                            break;
+                        }
+                    }
+
+                    if (found == null) {
+                        return null;
+                    }
+
+                    try {
+                        Field instanceField = clazz.getDeclaredField(this.toFieldName(split[0]));
+                        this.setAccessible(instanceField);
+                        Object value = instanceField.get(instance);
+                        if (value == null) {
+                            value = found.getDeclaredConstructor().newInstance();
+                            instanceField.set(instance, value);
+                        }
+
+                        clazz = found;
+                        instance = value;
+                        split = Arrays.copyOfRange(split, 1, split.length);
+                        continue;
+                    } catch (NoSuchFieldException e) {
+                        //
+                    }
+
+                    split = Arrays.copyOfRange(split, 1, split.length);
+                    clazz = found;
+                    instance = clazz.getDeclaredConstructor().newInstance();
+                }
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Translate a node to a java field name.
+     */
+    private String toFieldName(String node) {
+        return node.toUpperCase(Locale.ROOT).replaceAll("-", "_");
+    }
+
+    /**
+     * Translate a field to a config node.
+     */
+    private String toNodeName(String field) {
+        return field.toLowerCase(Locale.ROOT).replace("_", "-");
+    }
+
+    /**
+     * Set some field to be accessible.
+     */
+    private void setAccessible(Field field) throws NoSuchFieldException, IllegalAccessException {
+        field.setAccessible(true);
+        int modifiers = field.getModifiers();
+        if (Modifier.isFinal(modifiers)) {
+            final Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            final Unsafe unsafe = (Unsafe) unsafeField.get(null);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            unsafe.putInt(modifiersField, unsafe.objectFieldOffset(field), modifiers & ~Modifier.FINAL); // memory corruption
+        }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private String repeat(String s, int n) {
+        return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private String join(Object[] array, String delimiter) {
+        switch (array.length) {
+            case 0: {
+                return "";
+            }
+            case 1: {
+                return array[0].toString();
+            }
+            default: {
+                StringBuilder result = new StringBuilder();
+                for (int i = 0, j = array.length; i < j; i++) {
+                    if (i > 0) {
+                        result.append(delimiter);
+                    }
+                    result.append(array[i]);
+                }
+
+                return result.toString();
+            }
+        }
     }
 }
