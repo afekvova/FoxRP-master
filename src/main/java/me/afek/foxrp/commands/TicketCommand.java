@@ -2,12 +2,11 @@ package me.afek.foxrp.commands;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.commands.subcommands.*;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
-import me.afek.foxrp.database.FoxStorage;
-import me.afek.foxrp.repositories.impl.TicketRepository;
-import me.afek.foxrp.repositories.impl.WarningRepository;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,16 +17,20 @@ import java.util.Optional;
 import java.util.Set;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@me.afek.foxrp.commands.Command(command = "/ticket")
 public class TicketCommand implements CommandExecutor {
 
     Set<SubCommand> subCommandSet = new HashSet<>();
 
-    public TicketCommand(FoxStorage foxStorage, TicketRepository ticketRepository, WarningRepository warningRepository) {
+    public TicketCommand(final FoxRPPlugin plugin) {
+        val foxStorage = plugin.getFoxStorage();
+        val ticketRepository = plugin.getTicketRepository();
+
         this.subCommandSet.addAll(Arrays.asList(
                 new TicketEditCommand(foxStorage, ticketRepository),
                 new TicketGiveCommand(foxStorage, ticketRepository),
                 new TicketInfoCommand(ticketRepository),
-                new TicketPlayerCommand(ticketRepository, warningRepository),
+                new TicketPlayerCommand(ticketRepository, plugin.getWarningRepository()),
                 new TicketRemoveCommand(foxStorage, ticketRepository)));
     }
 

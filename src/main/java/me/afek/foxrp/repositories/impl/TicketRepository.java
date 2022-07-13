@@ -2,14 +2,17 @@ package me.afek.foxrp.repositories.impl;
 
 import me.afek.foxrp.model.Ticket;
 import me.afek.foxrp.repositories.BaseRepository;
+import me.afek.foxrp.repositories.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class TicketRepository implements BaseRepository<String, Ticket> {
 
-    private final ConcurrentHashMap<String, Ticket> tickets = new ConcurrentHashMap<>();
+    private final Map<String, Ticket> tickets = new ConcurrentHashMap<>();
 
     @Override
     public void initial() {
@@ -27,7 +30,7 @@ public class TicketRepository implements BaseRepository<String, Ticket> {
     }
 
     @Override
-    public boolean containData(String key) {
+    public boolean containsData(String key) {
         return this.tickets.containsKey(key.toLowerCase());
     }
 

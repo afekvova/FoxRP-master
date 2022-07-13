@@ -25,7 +25,7 @@ public class TicketRemoveCommand extends SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         String ticketId = args[0];
-        if (!this.repository.containData(ticketId)) {
+        if (!this.repository.containsData(ticketId)) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_REMOVE_COMMAND.NOT_EXIST));
             return;
         }

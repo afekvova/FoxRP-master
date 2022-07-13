@@ -4,17 +4,18 @@ import java.util.List;
 
 public interface BaseRepository<K, V> {
 
-    public void initial();
+    void initial();
 
-    public void close();
+    void close();
 
-    public void addData(K key, V value);
+    void addData(K key, V value);
 
-    public boolean containData(K key);
+    boolean containsData(K key);
 
-    public V removeData(K key);
+    V removeData(K key);
 
-    public V getData(K key);
+    V getData(K key);
 
-    public List<V> getData();
+    List<V> getData();
+
 }

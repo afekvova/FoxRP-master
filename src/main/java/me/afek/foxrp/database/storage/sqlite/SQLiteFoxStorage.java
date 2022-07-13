@@ -2,14 +2,13 @@ package me.afek.foxrp.database.storage.sqlite;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
 import me.afek.foxrp.model.Ticket;
-import me.afek.foxrp.repositories.impl.TicketRepository;
-import me.afek.foxrp.repositories.impl.WarningRepository;
 import org.bukkit.Bukkit;
 
 import java.sql.*;
@@ -23,53 +22,52 @@ public class SQLiteFoxStorage implements FoxStorage {
 
     FoxRPPlugin plugin;
 
-    TicketRepository ticketRepository;
-    WarningRepository warningRepository;
     ExecutorService executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("FoxRP-SQL-%d").build());
     Logger logger = Bukkit.getLogger();
 
     @NonFinal
     Connection connection;
+
+    @Getter
     @NonFinal
-    boolean connecting = false;
+    boolean connected = false;
 
     //TODO: Перевести всё на библиотеку ormlite
-    public SQLiteFoxStorage(FoxRPPlugin plugin, TicketRepository ticketRepository, WarningRepository warningRepository) {
+    public SQLiteFoxStorage(FoxRPPlugin plugin) {
         this.plugin = plugin;
-        this.ticketRepository = ticketRepository;
-        this.warningRepository = warningRepository;
 
         this.connect();
     }
 
     @Override
     public boolean connect() {
-
         try {
-            connecting = true;
+            this.connected = true;
 
-            if (executor.isShutdown() || (connection != null && connection.isValid(3)))
-                return false;
+            if (this.executor.isShutdown() || (this.connection != null && this.connection.isValid(3))) return false;
 
-            logger.info("[FoxRP] Connect to database...");
+            this.logger.info("[FoxRP] Connect to database...");
+
             long start = System.currentTimeMillis();
             if (Settings.IMP.SQL.STORAGE_TYPE.equalsIgnoreCase("mysql")) {
                 Settings.SQL s = Settings.IMP.SQL;
-                connectToDatabase(String.format("JDBC:mysql://%s:%s/%s?useSSL=false&useUnicode=true&characterEncoding=utf-8", s.HOSTNAME, String.valueOf(s.PORT), s.DATABASE), s.USER, s.PASSWORD);
+                connectToDatabase(String.format("JDBC:mysql://%s:%s/%s?useSSL=false&useUnicode=true&characterEncoding=utf-8", s.HOSTNAME, s.PORT, s.DATABASE), s.USER, s.PASSWORD);
             } else {
                 Class.forName("org.sqlite.JDBC");
                 connectToDatabase("JDBC:sqlite:" + this.plugin.getDataFolder() + "/database.db", null, null);
             }
-            logger.log(Level.INFO, "[FoxRP] Connected ({0} ms)", System.currentTimeMillis() - start);
+
+            this.logger.log(Level.INFO, "[FoxRP] Connected ({0} ms)", System.currentTimeMillis() - start);
+
             createTable();
             loadTickets();
             loadWarnings();
             return true;
         } catch (SQLException | ClassNotFoundException e) {
-            logger.log(Level.WARNING, "Can not connect to database or execute sql: ", e);
+            this.logger.log(Level.WARNING, "Can not connect to database or execute sql: ", e);
             connection = null;
         } finally {
-            connecting = false;
+            connected = false;
         }
 
         return false;
@@ -115,7 +113,7 @@ public class SQLiteFoxStorage implements FoxStorage {
                     continue;
                 }
 
-                this.ticketRepository.addData(ticket, new Ticket(ticket, player, reason, diamonds, finalTime));
+                plugin.getTicketRepository().addData(ticket, new Ticket(ticket, player, reason, diamonds, finalTime));
                 i++;
             }
 
@@ -136,7 +134,7 @@ public class SQLiteFoxStorage implements FoxStorage {
                     continue;
                 }
 
-                this.warningRepository.addData(playerName, warnings);
+                plugin.getWarningRepository().addData(playerName, warnings);
                 i++;
             }
 
@@ -146,7 +144,7 @@ public class SQLiteFoxStorage implements FoxStorage {
 
     @Override
     public void saveTicket(Ticket ticketData) {
-        if (connecting)
+        if (connected)
             return;
 
         if (connection != null) {
@@ -175,7 +173,7 @@ public class SQLiteFoxStorage implements FoxStorage {
 
     @Override
     public void saveWarning(String playerName, int warnings) {
-        if (connecting || isInvalidName(playerName))
+        if (connected || isInvalidName(playerName))
             return;
 
         if (connection != null) {
@@ -230,16 +228,12 @@ public class SQLiteFoxStorage implements FoxStorage {
     @Override
     public void disconnect() {
         this.executor.shutdownNow();
+
         try {
-            if (connection != null)
-                this.connection.close();
-        } catch (SQLException ignore) {
-        }
+            if (this.connection != null) this.connection.close();
+        } catch (SQLException ignore) {}
+
         this.connection = null;
     }
 
-    @Override
-    public boolean isConnected() {
-        return this.connecting;
-    }
 }

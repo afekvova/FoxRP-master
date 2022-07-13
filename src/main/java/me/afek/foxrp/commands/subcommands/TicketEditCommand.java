@@ -33,7 +33,7 @@ public class TicketEditCommand extends SubCommand {
         }
 
         String id = args[0];
-        if (!this.repository.containData(id)) {
+        if (!this.repository.containsData(id)) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_EDIT_COMMAND.NOT_EXIST));
             return;
         }

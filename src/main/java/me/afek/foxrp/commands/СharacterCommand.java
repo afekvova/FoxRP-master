@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
+@me.afek.foxrp.commands.Command(command = "/character")
 public class СharacterCommand implements CommandExecutor {
 
     private final FoxRPPlugin foxRPPlugin;

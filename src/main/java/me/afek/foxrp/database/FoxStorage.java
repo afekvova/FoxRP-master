@@ -4,17 +4,18 @@ import me.afek.foxrp.model.Ticket;
 
 public interface FoxStorage {
 
-    public boolean connect();
+    boolean connect();
 
-    public void disconnect();
+    void disconnect();
 
-    public boolean isConnected();
+    boolean isConnected();
 
-    public void saveTicket(Ticket ticket);
+    void saveTicket(final Ticket ticket);
 
-    public void saveWarning(String playerName, int warnings);
+    void saveWarning(final String playerName, final int warnings);
 
-    public void removeWarning(String playerName);
+    void removeWarning(final String playerName);
 
-    public void removeTicket(String ticketId);
+    void removeTicket(final String ticketId);
+
 }

@@ -8,9 +8,10 @@ import org.bukkit.inventory.ItemStack;
 
 public interface IMenu extends InventoryHolder {
 
-    public void onClick(Inventory inventory, ItemStack itemStack, Player player, int slot, ClickType clickType);
+    void onClick(final Inventory inventory, final ItemStack itemStack, final Player player, final int slot, final ClickType clickType);
 
-    public default void show(Player player) {
+    default void show(final Player player) {
         player.openInventory(getInventory());
     }
+
 }

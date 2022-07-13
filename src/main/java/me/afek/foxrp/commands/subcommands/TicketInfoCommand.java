@@ -21,7 +21,7 @@ public class TicketInfoCommand extends SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         String id = args[0];
-        if (!this.repository.containData(id)) {
+        if (!this.repository.containsData(id)) {
             sender.sendMessage(StringCommon.color(Settings.IMP.TICKET_INFO_COMMAND.NOT_EXIST));
             return;
         }

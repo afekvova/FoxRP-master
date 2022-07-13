@@ -26,8 +26,8 @@ public class StringCommon {
     }
 
     public static String padezh(String ed, String a, String b, String c, int n) {
-        if (n < 0)
-            n = -n;
+        if (n < 0) n = -n;
+
         int last = n % 100;
         if (last > 10 && last < 21)
             return ed + c;
@@ -38,6 +38,7 @@ public class StringCommon {
             return ed + a;
         if (last < 5)
             return ed + b;
+
         return ed + c;
     }
 

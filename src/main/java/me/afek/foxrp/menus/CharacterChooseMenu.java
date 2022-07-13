@@ -1,6 +1,7 @@
 package me.afek.foxrp.menus;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import me.afek.foxrp.FoxRPPlugin;
@@ -24,15 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CharacterChooseMenu implements IMenu {
-    FoxRPPlugin plugin;
 
-    @NonFinal
+    final FoxRPPlugin plugin;
+
+    @Getter
     Inventory inventory;
-    @NonFinal
+
     boolean delete;
-    @NonFinal
     int page = 1;
 
     public CharacterChooseMenu(FoxRPPlugin plugin, boolean delete) {
@@ -54,15 +55,15 @@ public class CharacterChooseMenu implements IMenu {
     @Override
     public void onClick(Inventory inventory, ItemStack itemStack, Player player, int slot, ClickType clickType) {
         if (itemStack == null || itemStack.getType() != Material.AIR) return;
+
         if (slot == 53) {
-            ++page;
+            page++;
             this.updateInventory(player);
             return;
         }
 
         if (slot == 45) {
-            if (page > 1)
-                --page;
+            if (page > 1) page--;
 
             this.updateInventory(player);
             return;
@@ -130,8 +131,6 @@ public class CharacterChooseMenu implements IMenu {
     public void updateInventory(Player player) {
         loadItems();
         List<Character> dataList = this.plugin.getCharacterRepository().getPlayerCharacters(player.getName());
-        if (dataList == null)
-            dataList = new ArrayList<>();
 
         int size = dataList.size();
         int index = page * 36 - 36 > size ? 1 : page * 36 - 36;
@@ -161,12 +160,7 @@ public class CharacterChooseMenu implements IMenu {
     }
 
     private void clearItems() {
-        for (int i = 9; i <= 53; i++)
-            this.inventory.setItem(i, new ItemStack(Material.AIR));
+        for (int i = 9; i <= 53; i++) this.inventory.setItem(i, new ItemStack(Material.AIR));
     }
 
-    @Override
-    public Inventory getInventory() {
-        return this.inventory;
-    }
 }

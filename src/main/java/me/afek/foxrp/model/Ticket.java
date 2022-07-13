@@ -15,4 +15,5 @@ public class Ticket {
     String idTicket, name, reason;
     int diamonds;
     long finalTime;
+
 }

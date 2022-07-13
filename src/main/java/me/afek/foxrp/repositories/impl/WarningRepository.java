@@ -1,13 +1,16 @@
 package me.afek.foxrp.repositories.impl;
 
 import me.afek.foxrp.repositories.BaseRepository;
+import me.afek.foxrp.repositories.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class WarningRepository implements BaseRepository<String, Integer> {
 
-    private final ConcurrentHashMap<String, Integer> warnings = new ConcurrentHashMap<>();
+    private final Map<String, Integer> warnings = new ConcurrentHashMap<>();
 
     @Override
     public void initial() {
@@ -22,12 +25,11 @@ public class WarningRepository implements BaseRepository<String, Integer> {
     @Override
     public void addData(String key, Integer value) {
         key = key.toLowerCase();
-        int playerWarnings = this.warnings.getOrDefault(key, 0);
-        this.warnings.put(key, ++playerWarnings);
+        this.warnings.put(key, this.warnings.getOrDefault(key, 0) + value);
     }
 
     @Override
-    public boolean containData(String key) {
+    public boolean containsData(String key) {
         return this.warnings.containsKey(key.toLowerCase());
     }
 

@@ -3,12 +3,12 @@ package me.afek.foxrp.listeners;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import me.afek.foxrp.FoxRPPlugin;
 import me.afek.foxrp.commons.StringCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.model.Character;
 import me.afek.foxrp.model.Ticket;
-import me.afek.foxrp.repositories.impl.CharacterRepository;
-import me.afek.foxrp.repositories.impl.TicketRepository;
 import net.skinsrestorer.api.SkinVariant;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.exception.SkinRequestException;
@@ -26,30 +26,31 @@ import java.util.regex.Pattern;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PlayerListener implements Listener {
 
-    TicketRepository ticketRepository;
-    CharacterRepository characterRepository;
-    Pattern NAME_PATTERN = Pattern.compile("^[а-яА-Я_of]+$");
+    static Pattern NAME_PATTERN = Pattern.compile("^[а-яА-Я_of]+$");
+
+    FoxRPPlugin plugin;
 
     @EventHandler
-    public void playerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        String playerName = player.getName();
+    private void onPlayerJoin(PlayerJoinEvent event) {
+        val player = event.getPlayer();
 
-        Ticket ticket = this.getTicketByPlayer(playerName);
+        val ticket = this.getTicketByPlayer(player.getName());
         if (ticket == null) return;
 
         player.sendMessage(StringCommon.color(String.format("{PRFX} У вас активный тикет! (%s)", ticket.getIdTicket())));
     }
 
     @EventHandler
-    public void playerChat(AsyncPlayerChatEvent event) {
+    private void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        val characterRepository = plugin.getCharacterRepository();
+
         Player player = event.getPlayer();
         String message = event.getMessage();
-        Character character = this.characterRepository.getData(player.getName());
+        Character character = characterRepository.getData(player.getName());
         if (character == null) return;
 
         if (message.equalsIgnoreCase(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE_WORD))) {
-            this.characterRepository.removeData(player.getName());
+            characterRepository.removeData(player.getName());
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.STOP_CREATE_SUCCESS));
             event.setCancelled(true);
             return;
@@ -84,20 +85,24 @@ public class PlayerListener implements Listener {
 
             character.setValue(property.getValue());
             character.setSignature(property.getSignature());
-            this.characterRepository.removeData(player.getName());
-            this.characterRepository.addPlayerCharacter(player.getName(), character);
+            characterRepository.removeData(player.getName());
+            characterRepository.addPlayerCharacter(player.getName(), character);
             player.sendMessage(StringCommon.color(Settings.IMP.MESSAGES.CREATE_CHARACTER.CREATE_CHARACTER_SUCCESS));
         }
     }
 
-    private boolean validMojangUsername(String username) {
+    private boolean validMojangUsername(final String username) {
         return username.length() <= 16 && NAME_PATTERN.matcher(username).matches();
     }
 
-    private Ticket getTicketByPlayer(String playerName) {
-        for (Ticket ticket : this.ticketRepository.getData())
-            if (ticket.getName().equalsIgnoreCase(playerName.toLowerCase())) return ticket;
+    private Ticket getTicketByPlayer(final String playerName) {
+        for (val ticket : plugin.getTicketRepository().getData()) {
+            if (!ticket.getName().equalsIgnoreCase(playerName.toLowerCase())) continue;
+
+            return ticket;
+        }
 
         return null;
     }
+
 }
