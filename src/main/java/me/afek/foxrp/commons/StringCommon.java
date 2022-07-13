@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 public class StringCommon {
 
     public static String color(String string) {
-        return ChatColor.translateAlternateColorCodes('&', string.replace("%prefix%", Settings.IMP.PREFIX).replace("{PREFIX}", Settings.IMP.PREFIX).replace("{PRFX}", Settings.IMP.PREFIX));
+        return ChatColor.translateAlternateColorCodes('&', string.replace("{PREFIX}", Settings.IMP.PREFIX).replace("{PRFX}", Settings.IMP.PREFIX));
     }
 
     public static boolean isStringInt(String s) {

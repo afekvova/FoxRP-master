@@ -1,4 +1,4 @@
-package me.afek.foxrp.utils;
+package me.afek.foxrp.tasks;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

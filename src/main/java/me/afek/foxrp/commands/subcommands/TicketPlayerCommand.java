@@ -1,7 +1,6 @@
 package me.afek.foxrp.commands.subcommands;
 
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import me.afek.foxrp.commands.SubCommand;
 import me.afek.foxrp.commons.DataCommon;
@@ -12,7 +11,6 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketPlayerCommand extends SubCommand {
 
@@ -43,7 +41,7 @@ public class TicketPlayerCommand extends SubCommand {
             return;
         }
 
-        sender.sendMessage(StringCommon.color("%prefix%Игрок: &6" + playerName));
+        sender.sendMessage(StringCommon.color("Игрок: &6" + playerName));
         sender.sendMessage(StringCommon.color("Всего штрафов: &6" + tickets.size()));
         sender.sendMessage(StringCommon.color("Варнов: &6" + this.dataCommon.getPlayerWarnings(playerName)));
 

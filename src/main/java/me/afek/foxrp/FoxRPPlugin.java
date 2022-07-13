@@ -4,16 +4,17 @@ import com.earth2me.essentials.Essentials;
 import lombok.Getter;
 import me.afek.foxrp.api.menu.InventoryListener;
 import me.afek.foxrp.commands.TicketCommand;
-import me.afek.foxrp.commands.subcommands.*;
+import me.afek.foxrp.commands.СharacterCommand;
 import me.afek.foxrp.commons.DataCommon;
 import me.afek.foxrp.config.Settings;
 import me.afek.foxrp.database.FoxStorage;
+import me.afek.foxrp.database.storage.StorageType;
 import me.afek.foxrp.database.storage.sqlite.SQLiteFoxStorage;
 import me.afek.foxrp.listeners.PlayerListener;
 import me.afek.foxrp.services.EssentialsService;
 import me.afek.foxrp.services.PlayerDataService;
 import me.afek.foxrp.services.SkinsRestorerService;
-import me.afek.foxrp.utils.PlayerTicketsTask;
+import me.afek.foxrp.tasks.PlayerTicketsTask;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -57,6 +58,10 @@ public final class FoxRPPlugin extends JavaPlugin {
 
         //TODO: Добавить поддержку типов базы данных
         this.foxStorage = new SQLiteFoxStorage(this, this.dataCommon);
+        if (!this.foxStorage.connect()) {
+            System.out.printf("Can't connect to database [%s]", StorageType.SQLITE.name());
+            return;
+        }
 
         Bukkit.getScheduler().runTaskTimer(this, new PlayerTicketsTask(this.dataCommon, this.foxStorage), 20L, 20L);
 
@@ -65,12 +70,8 @@ public final class FoxRPPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("bampplayer").setExecutor(new TicketPlayerCommand(this.dataCommon));
-        this.getCommand("bampedit").setExecutor(new TicketEditCommand(this.sql, this.dataCommon));
-        this.getCommand("bampinfo").setExecutor(new TicketInfoCommand(this.dataCommon));
-        this.getCommand("bampgive").setExecutor(new TicketGiveCommand(this.sql, this.dataCommon));
-        this.getCommand("bampremove").setExecutor(new TicketRemoveCommand(this.sql, this.dataCommon));
-        this.getCommand("character").setExecutor(new TicketCommand());
+        this.getCommand("ticket").setExecutor(new TicketCommand(this.foxStorage, this.dataCommon));
+        this.getCommand("character").setExecutor(new СharacterCommand());
     }
 
     @Override
